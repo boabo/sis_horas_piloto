@@ -43,7 +43,7 @@ Phx.vista.TipoFlota=Ext.extend(Phx.gridInterfaz,{
                     fields : ['codigo', 'nombre'],
                     data : [['largo_alcance', 'Largo Alcance'], ['mediano_alcance', 'Mediano Alcance'], ['corto_alcance', 'Corto Alcance']]
                 }),
-                anchor : '100%',
+                anchor : '50%',
                 valueField : 'codigo',
                 displayField : 'nombre',
                 gwidth:100,
@@ -77,7 +77,7 @@ Phx.vista.TipoFlota=Ext.extend(Phx.gridInterfaz,{
 				name: 'costo_hora_base_pic',
 				fieldLabel: 'Costo Hora Base PIC',
 				allowBlank: false,
-				anchor: '100%',
+				anchor: '40%',
 				gwidth: 140,
 				maxLength:1310722,
                 galign:'right',
@@ -97,7 +97,7 @@ Phx.vista.TipoFlota=Ext.extend(Phx.gridInterfaz,{
 				name: 'costo_hora_base_sic',
 				fieldLabel: 'Costo Hora Base SIC',
 				allowBlank: false,
-				anchor: '100%',
+				anchor: '40%',
 				gwidth: 140,
 				maxLength:1310722,
                 galign:'right',
@@ -117,7 +117,7 @@ Phx.vista.TipoFlota=Ext.extend(Phx.gridInterfaz,{
 				name: 'horas_base',
 				fieldLabel: 'Horas Base',
 				allowBlank: true,
-				anchor: '80%',
+				anchor: '40%',
 				gwidth: 100,
 				maxLength:4,
                 renderer:function (value,p,record){
@@ -136,7 +136,7 @@ Phx.vista.TipoFlota=Ext.extend(Phx.gridInterfaz,{
 				name: 'relacion_ciclo_hora',
 				fieldLabel: 'Relacion Ciclo Hora',
 				allowBlank: false,
-				anchor: '80%',
+				anchor: '40%',
 				gwidth: 100,
 				maxLength:1310722
 			},
@@ -151,7 +151,7 @@ Phx.vista.TipoFlota=Ext.extend(Phx.gridInterfaz,{
 				name: 'maximo_horas',
 				fieldLabel: 'Maximo Horas',
 				allowBlank: true,
-				anchor: '80%',
+				anchor: '40%',
 				gwidth: 100,
 				maxLength:4
 			},

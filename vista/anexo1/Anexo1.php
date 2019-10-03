@@ -62,9 +62,10 @@ header("content-type: text/javascript; charset=UTF-8");
                         mode: 'remote',
                         pageSize: 15,
                         queryDelay: 1000,
-                        anchor: '100%',
+                        anchor: '70%',
                         gwidth: 300,
                         minChars: 2,
+                        resizable:true,
                         renderer : function(value, p, record) {
                             return String.format('{0}', record.data['desc_nombre_salarial']);
                         }
@@ -81,7 +82,7 @@ header("content-type: text/javascript; charset=UTF-8");
                         name: 'numero_casos',
                         fieldLabel: 'Numero Casos',
                         allowBlank: true,
-                        anchor: '80%',
+                        anchor: '40%',
                         gwidth: 100,
                         maxLength:4
                     },
@@ -97,7 +98,7 @@ header("content-type: text/javascript; charset=UTF-8");
                         name: 'remuneracion_basica',
                         fieldLabel: 'Remuneracion Basica',
                         allowBlank: true,
-                        anchor: '80%',
+                        anchor: '40%',
                         gwidth: 150,
                         maxLength:1179650,
                         galign:'right',
@@ -117,7 +118,7 @@ header("content-type: text/javascript; charset=UTF-8");
                         name: 'remuneracion_maxima',
                         fieldLabel: 'Remuneracion Maxima',
                         allowBlank: true,
-                        anchor: '80%',
+                        anchor: '40%',
                         gwidth: 150,
                         maxLength:1179650,
                         galign:'right',
@@ -144,7 +145,7 @@ header("content-type: text/javascript; charset=UTF-8");
                             fields : ['codigo', 'nombre'],
                             data : [['largo_alcance', 'Largo Alcance'], ['mediano_alcance', 'Mediano Alcance'], ['corto_alcance', 'Corto Alcance']]
                         }),
-                        anchor : '100%',
+                        anchor : '40%',
                         valueField : 'codigo',
                         displayField : 'nombre',
                         gwidth:100,
@@ -185,7 +186,7 @@ header("content-type: text/javascript; charset=UTF-8");
                             fields : ['codigo', 'nombre'],
                             data : [['PIC', 'Piloto'], ['SIC', 'Copiloto']]
                         }),
-                        anchor : '100%',
+                        anchor : '40%',
                         valueField : 'codigo',
                         displayField : 'nombre',
                         gwidth:100,

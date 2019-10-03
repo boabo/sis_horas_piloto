@@ -37,7 +37,7 @@ header("content-type: text/javascript; charset=UTF-8");
                         name: 'tipo_simulador',
                         fieldLabel: 'Tipo Simulador',
                         allowBlank: false,
-                        anchor: '100%',
+                        anchor: '50%',
                         gwidth: 150,
                         /*maxLength:1310722*/
                     },
@@ -53,7 +53,7 @@ header("content-type: text/javascript; charset=UTF-8");
                         name: 'costo_hora',
                         fieldLabel: 'Costo Hora',
                         allowBlank: false,
-                        anchor: '80%',
+                        anchor: '50%',
                         gwidth: 100,
                         maxLength:1310722,
                         galign:'right',
@@ -73,7 +73,7 @@ header("content-type: text/javascript; charset=UTF-8");
                         name: 'maximo_horas',
                         fieldLabel: 'Maximo Horas',
                         allowBlank: true,
-                        anchor: '80%',
+                        anchor: '50%',
                         gwidth: 100,
                         maxLength:4
                     },
