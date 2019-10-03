@@ -142,7 +142,7 @@ Phx.vista.ArchivoHorasPiloto=Ext.extend(Phx.gridInterfaz,{
             text: 'Historial Modificaciones',
             //iconCls: 'blist',
             iconCls:'log',
-            disabled: false,
+            disabled: true,
             handler:this.logPagoVariable,
             tooltip: '<b>Finaliza</b><br/>El Pago Variable'
         });        
@@ -538,18 +538,21 @@ Phx.vista.ArchivoHorasPiloto=Ext.extend(Phx.gridInterfaz,{
             this.getBoton('btnCalPagoVariable').disable();
             this.getBoton('btnRepPagoVariable').disable();
             this.getBoton('btnborrar_calculo').disable();
+            this.getBoton('btnLogPagoVariable').disable();
             this.getBoton('btnsubir_archivo').enable();
         }else if (data.estado == 'archivo_cargado'){           
             this.getBoton('btnFinPagoVariable').disable();
             this.getBoton('btnRepPagoVariable').disable();
             this.getBoton('btnborrar_calculo').disable();
             this.getBoton('btnsubir_archivo').disable();
+            this.getBoton('btnLogPagoVariable').enable();
             this.getBoton('btnborrar_archivo').enable();
             this.getBoton('btnCalPagoVariable').enable();            
         }else if (data.estado == 'calculado'){            
             this.getBoton('btnsubir_archivo').disable();
             this.getBoton('btnborrar_calculo').enable();
             this.getBoton('btnFinPagoVariable').enable();
+            this.getBoton('btnLogPagoVariable').enable();
             this.getBoton('btnborrar_archivo').disable();
             this.getBoton('btnCalPagoVariable').disable();
             this.getBoton('btnRepPagoVariable').enable();        
@@ -559,7 +562,8 @@ Phx.vista.ArchivoHorasPiloto=Ext.extend(Phx.gridInterfaz,{
             this.getBoton('btnCalPagoVariable').disable();
             this.getBoton('btnsubir_archivo').disable(); 
             this.getBoton('btnborrar_calculo').disable();
-            this.getBoton('btnRepPagoVariable').enable();            
+            this.getBoton('btnRepPagoVariable').enable();
+            this.getBoton('btnLogPagoVariable').enable();
         }
     },    
 
