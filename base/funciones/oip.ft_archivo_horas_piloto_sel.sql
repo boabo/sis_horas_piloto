@@ -142,7 +142,8 @@ BEGIN
                     inner join oip.thoras_piloto hopi on hopi.id_archivo_horas_piloto = arhopi.id_archivo_horas_piloto
                     inner join param.tgestion ges on ges.id_gestion = arhopi.id_gestion
                     inner join orga.tcargo car on car.id_cargo = hopi.id_cargo
-                    inner join orga.tescala_salarial esc on esc.tescala_salarial = car.tescala_salarial
+                    inner join orga.tescala_salarial esc on esc.id_escala_salarial = car.id_escala_salarial
+                    inner join orga.tcategoria_salarial cat on cat.id_categoria_salarial= esc.id_categoria_salarial
                     where cat.codigo = ''SUPER'' and ';
 			
 			--Definicion de la respuesta		    

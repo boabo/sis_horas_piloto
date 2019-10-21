@@ -345,36 +345,34 @@ BEGIN
         loop
         	
 			---validaciones inicio----------
-			SELECT
-                    tes.haber_basico,
-                    anex.remuneracion_basica,
-                    anex.remuneracion_maxima,
-                    anex.pic_sic,
-                    anex.tipo_flota,
-                    cargo.codigo as nro_item,
-                    funcio.desc_funcionario2,
-                    tes.nombre
+            select esc.haber_basico,
+                   anex.remuneracion_basica,
+                   anex.remuneracion_maxima,
+                   anex.pic_sic,
+                   anex.tipo_flota,
+                   car.codigo as nro_item,
+                   vf.desc_funcionario2,
+                   esc.nombre
             	into 
-                    v_rec_esc
-            FROM orga.tuo_funcionario uofunc 
-            INNER JOIN orga.vfuncionario funcio ON funcio.id_funcionario = uofunc.id_funcionario
-            LEFT JOIN orga.tcargo cargo ON cargo.id_cargo = uofunc.id_cargo
-            left join orga.tescala_salarial tes on tes.id_escala_salarial = cargo.id_escala_salarial
-            left join orga.tcategoria_salarial cat on cat.id_categoria_salarial = tes.id_categoria_salarial
-            left join oip.tanexo1 anex on anex.id_escala_salarial = tes.id_escala_salarial
-            WHERE  uofunc.estado_reg !='inactivo' 
-            and funcio.id_funcionario = v_rec.id_funcionario;
+                   v_rec_esc                   
+            from orga.vfuncionario_cargo_lugar vf
+            left join orga.tcargo car on car.id_cargo = vf.id_cargo
+            left join orga.tescala_salarial esc on esc.id_escala_salarial = car.id_escala_salarial
+            left join orga.tcategoria_salarial cat on cat.id_categoria_salarial = esc.id_categoria_salarial
+            left join oip.tanexo1 anex on anex.id_escala_salarial = esc.id_escala_salarial
+            where vf.id_funcionario = v_rec.id_funcionario	            
+                and cat.codigo = 'SUPER';
 
 
             IF (v_rec_esc.haber_basico is null or v_rec_esc.remuneracion_basica is null ) then 
-            	raise exception 'El funcionario % no cuenta con un haber basico ',v_rec_esc.desc_funcionario2;	
+            	raise exception 'El funcionario % no cuenta con un haber basico ',coalesce(v_rec_esc.desc_funcionario2,v_rec.nombre_piloto);
             end if;
             
-            if v_rec_esc.pic_sic = v_rec.pic_sic then
+            if v_rec_esc.pic_sic <> v_rec.pic_sic then
             	raise exception 'Existe diferencia de cargo para el funcionario %,Dentro la escala salarial tiene cargo: %',v_rec_esc.desc_funcionario2, v_rec_esc.nombre;
             end if;
             
-            if v_rec_esc.tipo_flota = v_rec.tipo_flota then 
+            if v_rec_esc.tipo_flota <> v_rec.tipo_flota then 
             	raise exception 'Existe diferencia de tipo flota para el funcionario %',v_rec_esc.desc_funcionario2;
             end if;
             
@@ -417,12 +415,11 @@ BEGIN
             
             -- Formula Pago Variable        
             v_pago_variable = ( v_A + ( coalesce( V_B, 0 ) +  coalesce( V_C, 0 ) ));
-        
-            
+                    
 
             
             if ( (v_rec_esc.haber_basico + v_pago_variable) between v_rec_esc.remuneracion_basica and v_rec_esc.remuneracion_maxima ) then 
-                            ------- Actualizacion de datos
+                ------- Actualizacion de datos
                 update oip.thoras_piloto set 
                 factor_esfuerzo = v_factor_esfuerzo,
                 pago_variable   = v_pago_variable,
@@ -433,12 +430,10 @@ BEGIN
                 horas_simulador_fix_efectivas = coalesce(v_horas_simulador.p_resp_fix, 0)
                 where id_horas_piloto = v_rec.id_horas_piloto; 
 			else 
-            	raise exception 'La maxima remuneracion para el funcionario % es de: y su haber basico mas su pago variable 
-                		superan la remuneracion maxima de % ',(v_rec_esc.haber_basico + v_pago_variable),  v_rec_esc.remuneracion_maxima;                
+            	raise exception 'La maxima remuneracion para el funcionario % es de: %, y su haber basico mas su pago variable 
+                		superan la remuneracion maxima de % ', v_rec.nombre_piloto, (v_rec_esc.haber_basico + v_pago_variable),  v_rec_esc.remuneracion_maxima;                
 			end if;       
-                                 
- 
-                          
+                                                            
  
                        
         end loop; 
@@ -448,7 +443,7 @@ BEGIN
             from oip.thoras_piloto 
             where id_archivo_horas_piloto = v_parametros.id_archivo_horas_piloto;
             
-        	--cambio de estado 
+        	--cambio de estado  y actualizacion de pago total 
         	update oip.tarchivo_horas_piloto set
             estado = 'calculado',
             pago_total = v_pago_total

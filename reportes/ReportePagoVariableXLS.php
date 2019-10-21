@@ -156,7 +156,7 @@ class ReportePagoVariableXLS
         $this->docexcel->getActiveSheet()->getStyle('D4:F4')->applyFromArray($styleGestion);
         $sheet0->setCellValue('D4', 'Moneda(bolivianos)');
 
-        $this->docexcel->getActiveSheet()->getStyle('A7:M7')->applyFromArray($styleSubTitulos);
+        $this->docexcel->getActiveSheet()->getStyle('A7:N7')->applyFromArray($styleSubTitulos);
 
         $ini = 7;
         //*************************************Cabecera*****************************************
@@ -194,7 +194,7 @@ class ReportePagoVariableXLS
         $fila = 8;
         $contador = 1;        
         /////////////////////***********************************Detalle***********************************************
-        $this->docexcel->getActiveSheet()->getStyle('I:M')->getNumberFormat()->setFormatCode('#,##0.00');
+        $this->docexcel->getActiveSheet()->getStyle('I:N')->getNumberFormat()->setFormatCode('#,##0.00');
         foreach($datos as $value) {
             $this->total_horas_vuelo += $value['horas_vuelo'];
             $this->total_h_s_full += $value['horas_simulador_full'];
@@ -226,7 +226,7 @@ class ReportePagoVariableXLS
             $contador++;
         }
         $sheet0->mergeCells('A'.$fila.':C'.$fila.'');
-        $this->docexcel->getActiveSheet()->getStyle('A'.$fila.':M'.$fila.'')->applyFromArray($styleFoot);        
+        $this->docexcel->getActiveSheet()->getStyle('A'.$fila.':N'.$fila.'')->applyFromArray($styleFoot);        
         $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(0,$fila, 'TOTALES');
         $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(1,$fila, 'TOTALES');
         $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(2,$fila, '');

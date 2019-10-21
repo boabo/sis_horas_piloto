@@ -35,7 +35,7 @@ VALUES
   (830, NULL, E'2019-09-19 10:44:53', E'2019-09-19 10:44:53', E'activo', NULL, NULL, 2, E'Fix Based Simulator', '139.2', 20);
 
 /* Data for the 'oip.tanexo1' table  (Records 1 - 10) */
-
+TRUNCATE TABLE oip.tanexo1;
 INSERT INTO oip.tanexo1 ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "id_anexo1", "id_escala_salarial", "numero_casos", "remuneracion_basica", "remuneracion_maxima", "tipo_flota", "pic_sic")
 VALUES
   (830, NULL, E'2019-09-26 12:13:33', E'2019-09-26 12:13:33', E'activo', NULL, NULL, 2, 158, 1, '22367', '22367', E'largo_alcance', E'PIC'),
@@ -45,7 +45,9 @@ VALUES
   (830, NULL, E'2019-09-26 18:00:19', E'2019-09-26 18:00:19', E'activo', NULL, NULL, 6, 160, 48, '28534', '52358', E'mediano_alcance', E'PIC'),
   (830, NULL, E'2019-09-26 18:02:37', E'2019-09-26 18:02:37', E'activo', NULL, NULL, 7, 263, 5, '23230', '32142', E'corto_alcance', E'PIC'),
   (830, NULL, E'2019-09-26 18:04:19', E'2019-09-26 18:04:19', E'activo', NULL, NULL, 8, 264, 12, '20907', '29819', E'corto_alcance', E'PIC'),
-  (830, NULL, E'2019-09-26 18:05:36', E'2019-09-26 18:05:36', E'activo', NULL, NULL, 9, 265, 18, '26173', '21214', E'largo_alcance', E'SIC'),
-  (830, NULL, E'2019-09-26 18:06:21', E'2019-09-26 18:06:21', E'activo', NULL, NULL, 10, 261, 45, '18405', '26173', E'mediano_alcance', E'SIC'),
+  (830, NULL, E'2019-09-26 18:05:36', E'2019-09-26 18:05:36', E'activo', NULL, NULL, 9, 261, 18, '18405', '21214', E'largo_alcance', E'SIC'),
+  (830, NULL, E'2019-09-26 18:06:21', E'2019-09-26 18:06:21', E'activo', NULL, NULL, 10, 201, 45, '17045', '26173', E'mediano_alcance', E'SIC'),
   (830, NULL, E'2019-09-26 18:07:18', E'2019-09-26 18:07:18', E'activo', NULL, NULL, 11, 250, 16, '10974', '15430', E'corto_alcance', E'SIC');
 /*******************************************F-DAT-BVP-HORAS-PILOTO-0-02/10/2019***********************************************/
+
+

@@ -126,7 +126,7 @@ Phx.vista.ArchivoHorasPiloto=Ext.extend(Phx.gridInterfaz,{
             iconCls: 'bassign',
             disabled: true,
             handler:this.finPagoVariable,
-            tooltip: '<b>Finaliza</b><br/>El Pago Variable'
+            tooltip: '<b>Finaliza</b><br/>El Pago Variable.'
         });
 
         this.addButton('btnRepPagoVariable', {                
@@ -135,7 +135,7 @@ Phx.vista.ArchivoHorasPiloto=Ext.extend(Phx.gridInterfaz,{
             iconCls:'button-repoExcel',           
             disabled: true,
             handler:this.repPagoVariable,
-            tooltip: '<b>Reporte</b><br/>Genral del Pago Variable'
+            tooltip: '<b>Reporte</b><br/>Genera reporte excel, del Pago Variable.'
         });
 
         this.addButton('btnLogPagoVariable', {                
@@ -144,7 +144,7 @@ Phx.vista.ArchivoHorasPiloto=Ext.extend(Phx.gridInterfaz,{
             iconCls:'log',
             disabled: true,
             handler:this.logPagoVariable,
-            tooltip: '<b>Finaliza</b><br/>El Pago Variable'
+            tooltip: '<b>Finaliza</b><br/>Historial de cambios de estado.'
         });        
 
 		this.load({params:{start:0, limit:this.tam_pag}})
