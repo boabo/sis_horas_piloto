@@ -48,7 +48,7 @@ header("content-type: text/javascript; charset=UTF-8");
                             totalProperty: 'total',
                             fields: ['id_escala_salarial', 'nombre', 'codigo','haber_basico'],
                             remoteSort: true,
-                            baseParams: {par_filtro: 'escsal.nombre#escsal.codigo#escal.haber_basico'}
+                            baseParams: {par_filtro: 'nombre#codigo#haber_basico'}
                         }),
                         valueField: 'id_escala_salarial',
                         displayField: 'nombre',
