@@ -33,8 +33,7 @@ DECLARE
     v_id_gestion					integer;
     v_id_periodo					integer;
     v_id_horas_piloto				integer;
-    v_registros_json				record;
-    v_fun							record;
+    v_registros_json				record;    
     v_json							varchar;
     v_id_funcionario				integer;
     v_tipo_flota					varchar;
@@ -46,6 +45,8 @@ DECLARE
     v_periodo						integer;
     v_count							integer;
 	v_gestion_pago					record;		    
+	v_rec_esc    	    			record;
+	v_real_tipo_flota    		    varchar;    
 BEGIN
 
     v_nombre_funcion = 'oip.ft_archivo_horas_piloto_ime';
@@ -377,10 +378,11 @@ BEGIN
             from oip.tarchivo_horas_piloto 
             where id_periodo = v_rec.id_periodo 
             and id_gestion = v_rec.id_gestion; 
-                       
+
+            --verifica periodo existe 
             if  v_gestion_pago.id_periodo is not null then
             
-             	v_json = v_parametros.pilotos:: JSON->>'pilotos';
+             	v_json = v_parametros.pilotos:: JSON->>'pilotos'; -- json con los datos de los pilotos 
       			
                       for v_registros_json in SELECT json_array_elements(v_json :: JSON) loop
 
@@ -397,30 +399,45 @@ BEGIN
                           elsif  v_values::json->>'tipo_flota' = 'CORTO' then
                                   v_tipo_flota = 'corto_alcance';
                           end if; 
-                          
-                      ---controlar funcionario existe                
-                      if exists(select 1 from oip.thoras_piloto where id_archivo_horas_piloto = v_gestion_pago.id_archivo_horas_piloto
-                      			and id_funcionario = v_id_funcionario )then
-                      
+
+                          ---verficacion de funcionario y captura de datos funcionario ----------
+                            select
+                                   anex.pic_sic,
+                                   anex.tipo_flota,
+                                   vf.id_funcionario,
+                                   vf.desc_funcionario2 as nombre_piloto,
+                                   vf.ci,
+                                   vf.id_cargo
+                                into 
+                                   v_rec_esc                   
+                            from orga.vfuncionario_cargo_lugar vf
+                            left join orga.tcargo car on car.id_cargo = vf.id_cargo
+                            left join orga.tescala_salarial esc on esc.id_escala_salarial = car.id_escala_salarial
+                            left join orga.tcategoria_salarial cat on cat.id_categoria_salarial = esc.id_categoria_salarial
+                            left join oip.tanexo1 anex on anex.id_escala_salarial = esc.id_escala_salarial
+                            where vf.id_funcionario = v_id_funcionario           
+                                and cat.codigo = 'SUPER';
+
+                      ---control funcionario existe dentro el periodo 
+                	  if v_rec_esc.id_funcionario is not null then
+                                -- caso de diferencia actualiza el tipo flota del cargo con item del ERP, si no se mantiene
+                                if v_rec_esc.tipo_flota <> v_tipo_flota then
+                                	v_real_tipo_flota = v_rec_esc.tipo_flota;
+                                else 
+                                	v_real_tipo_flota = v_tipo_flota;
+                                end if; 
+
+                        if exists(select 1 from oip.thoras_piloto where id_archivo_horas_piloto = v_gestion_pago.id_archivo_horas_piloto
+                                    and id_funcionario = v_id_funcionario )then
+                        
                                 update oip.thoras_piloto set
                                 horas_vuelo = v_horas_vuelo,
                                 pic_sic =  v_cargo,
-                                tipo_flota = v_tipo_flota
+                                tipo_flota = v_real_tipo_flota
                                 where id_archivo_horas_piloto = v_gestion_pago.id_archivo_horas_piloto
-                                      and id_funcionario = v_id_funcionario;
-                      else
+                                    and id_funcionario = v_id_funcionario;
+                        else
                       
-                                -- datos funcionario 
-                                select fun.id_funcionario,
-                                       fun.desc_funcionario2 as nombre_piloto,
-                                       fun.ci,
-                                       fun.id_cargo
-                                      into 
-                                       v_fun
-                                from orga.vfuncionario_cargo_lugar fun
-                                where fun.id_funcionario = v_id_funcionario;
-                          
-                          if v_fun.id_funcionario is not null then 
                                 --Sentencia de la insercion
                                 insert into oip.thoras_piloto(
                                 estado_reg,
@@ -444,13 +461,13 @@ BEGIN
                                 'activo',
                                 v_rec.id_gestion,
                                 v_rec.id_periodo,
-                                v_fun.ci,
-                                v_fun.nombre_piloto,
-                                v_tipo_flota,
+                                v_fv_rec_escun.ci,
+                                v_rec_esc.nombre_piloto,
+                                v_real_tipo_flota,
                                 v_horas_vuelo,
                                 v_id_archivo_horas_piloto,
                                 v_id_funcionario,
-                                v_fun.id_cargo,
+                                v_rec_esc.id_cargo,
                                 'activo',
                                 v_cargo,
                                 p_id_usuario,
@@ -464,8 +481,7 @@ BEGIN
                       end if;
     			        
                    	 end loop;
-                    
-	            --		raise exception 'Estimado Usuario ya se tiene un registro para el mes: % , en la gestion: %', v_rec.mes, v_gestion;
+                    	            
             else 
             
                   --Sentencia de la insercion cabecera
@@ -516,59 +532,73 @@ BEGIN
                                   v_tipo_flota = 'corto_alcance';
                           end if;                    
                           
-                          -- datos funcionario 
-                          select fun.id_funcionario,
-                                 fun.desc_funcionario2 as nombre_piloto,
-                                 fun.ci,
-                                 fun.id_cargo
+                          ---verficacion de funcionario y captura de datos funcionario ----------
+                            select
+                                   anex.pic_sic,
+                                   anex.tipo_flota,
+                                   vf.id_funcionario,
+                                   vf.desc_funcionario2 as nombre_piloto,
+                                   vf.ci,
+                                   vf.id_cargo
                                 into 
-                                 v_fun
-                          from orga.vfuncionario_cargo_lugar fun
-                          where fun.id_funcionario = v_id_funcionario;
+                                   v_rec_esc                   
+                            from orga.vfuncionario_cargo_lugar vf
+                            left join orga.tcargo car on car.id_cargo = vf.id_cargo
+                            left join orga.tescala_salarial esc on esc.id_escala_salarial = car.id_escala_salarial
+                            left join orga.tcategoria_salarial cat on cat.id_categoria_salarial = esc.id_categoria_salarial
+                            left join oip.tanexo1 anex on anex.id_escala_salarial = esc.id_escala_salarial
+                            where vf.id_funcionario = v_id_funcionario          
+                                and cat.codigo = 'SUPER';
                                               
                           
-      					  if v_fun.id_funcionario is not null then 
-                                
-                                --Sentencia de la insercion
-                                insert into oip.thoras_piloto(
-                                estado_reg,
-                                gestion,
-                                mes,
-                                ci,
-                                nombre_piloto,
-                                tipo_flota,
-                                horas_vuelo,
-                                id_archivo_horas_piloto,
-                                id_funcionario,
-                                id_cargo,
-                                estado,
-                                pic_sic,
-                                id_usuario_reg,
-                                fecha_reg,
-                                id_usuario_ai,
-                                usuario_ai,
-                                id_usuario_mod,
-                                fecha_mod
-                                ) values(
-                                'activo',
-                                v_rec.id_gestion,
-                                v_rec.id_periodo,
-                                v_fun.ci,
-                                v_fun.nombre_piloto,
-                                v_tipo_flota,
-                                v_horas_vuelo,
-                                v_id_archivo_horas_piloto,
-                                v_id_funcionario,
-                                v_fun.id_cargo,
-                                'activo',
-                                v_cargo,
-                                p_id_usuario,
-                                now(),
-                                v_parametros._id_usuario_ai,
-                                v_parametros._nombre_usuario_ai,
-                                null,
-                                null													
-                                );
+      					  if v_rec_esc.id_funcionario is not null then 
+                                -- caso de diferencia actualiza el tipo flota del cargo con item del ERP, si no se mantiene
+                                if v_rec_esc.tipo_flota <> v_tipo_flota then
+                                	v_real_tipo_flota = v_rec_esc.tipo_flota;
+                                else 
+                                	v_real_tipo_flota = v_tipo_flota;
+                                end if;    
+
+                            --Sentencia de la insercion
+                            insert into oip.thoras_piloto(
+                            estado_reg,
+                            gestion,
+                            mes,
+                            ci,
+                            nombre_piloto,
+                            tipo_flota,
+                            horas_vuelo,
+                            id_archivo_horas_piloto,
+                            id_funcionario,
+                            id_cargo,
+                            estado,
+                            pic_sic,
+                            id_usuario_reg,
+                            fecha_reg,
+                            id_usuario_ai,
+                            usuario_ai,
+                            id_usuario_mod,
+                            fecha_mod
+                            ) values(
+                            'activo',
+                            v_rec.id_gestion,
+                            v_rec.id_periodo,
+                            v_rec_esc.ci,
+                            v_rec_esc.nombre_piloto,
+                            v_real_tipo_flota,
+                            v_horas_vuelo,
+                            v_id_archivo_horas_piloto,
+                            v_id_funcionario,
+                            v_rec_esc.id_cargo,
+                            'activo',
+                            v_cargo,
+                            p_id_usuario,
+                            now(),
+                            v_parametros._id_usuario_ai,
+                            v_parametros._nombre_usuario_ai,
+                            null,
+                            null													
+                            );
 							end if;                                                               
                       end loop;                
       				

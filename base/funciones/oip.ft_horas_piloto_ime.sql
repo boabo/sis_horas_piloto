@@ -202,13 +202,22 @@ BEGIN
 		begin
 
             --- captura del funcionario a actualizar
-            select fun.id_funcionario,
-                   fun.desc_funcionario2 as nombre_piloto,
-                   fun.id_cargo
-                  into 
-                   v_fun
-            from orga.vfuncionario_cargo_lugar fun
-            where fun.id_funcionario = v_parametros.ci;
+            select
+                   anex.pic_sic,
+                   anex.tipo_flota,
+                   vf.id_funcionario,
+                   vf.desc_funcionario2 as nombre_piloto,
+                   vf.ci,
+                   vf.id_cargo
+                into 
+                   v_fun                   
+            from orga.vfuncionario_cargo_lugar vf
+            left join orga.tcargo car on car.id_cargo = vf.id_cargo
+            left join orga.tescala_salarial esc on esc.id_escala_salarial = car.id_escala_salarial
+            left join orga.tcategoria_salarial cat on cat.id_categoria_salarial = esc.id_categoria_salarial
+            left join oip.tanexo1 anex on anex.id_escala_salarial = esc.id_escala_salarial
+            where vf.ci = v_parametros.ci
+                and cat.codigo = 'SUPER';
             
             -- captura de ids gestion, periodo
             select ges.id_gestion,
@@ -255,8 +264,8 @@ BEGIN
                           v_parametros.id_archivo_horas_piloto,
                           v_fun.id_funcionario,
                           v_fun.id_cargo,
-                          'sin_tf',
-                          'sin_car',
+                          v_fun.tipo_flota,
+                          v_fun.pic_sic,
                           'activo',
                           p_id_usuario,
                           now(),
@@ -269,11 +278,7 @@ BEGIN
                 else
                 
                         --Sentencia de la modificacion
-                        update oip.thoras_piloto set
-                        gestion = v_gestion,
-                        mes = v_periodo,
-                        ci = v_parametros.ci,
-                        nombre_piloto = v_parametros.nombre_piloto,
+                        update oip.thoras_piloto set                                                                                                
                         horas_simulador_full = v_parametros.horas_simulador_full,
                         horas_simulador_fix = v_parametros.horas_simulador_fix,
                         id_usuario_mod = p_id_usuario,
@@ -281,7 +286,7 @@ BEGIN
                         id_usuario_ai = v_parametros._id_usuario_ai,
                         usuario_ai = v_parametros._nombre_usuario_ai
                         where ci = v_parametros.ci and id_archivo_horas_piloto = v_parametros.id_archivo_horas_piloto;
-                        --and tipo_flota = v_parametros.tipo_flota;                                                                
+
                 end if; 
             
        	end if;
@@ -485,7 +490,7 @@ BEGIN
 
 	/*********************************    
  	#TRANSACCION:  'OIP_UPSIMPILO_MOD'
- 	#DESCRIPCION:	insercion de registros
+ 	#DESCRIPCION:	servicio para insercion o acualizacion de registros
  	#AUTOR:		breydi.vasquez	
  	#FECHA:		24-09-2019
 	***********************************/        
@@ -523,80 +528,87 @@ BEGIN
              		v_values = v_registros_json.json_array_elements::json;
                     
                     --- captura del funcionario a actualizar
-                    select fun.id_funcionario,
-                           fun.desc_funcionario2 as nombre_piloto,
-                           fun.id_cargo
-                          into 
-                           v_fun
-                    from orga.vfuncionario_cargo_lugar fun
-                    where fun.id_funcionario = v_values::json->>'id_funcionario';
+                        select
+                                anex.pic_sic,
+                                anex.tipo_flota,
+                                vf.id_funcionario,
+                                vf.desc_funcionario2 as nombre_piloto,
+                                vf.ci,
+                                vf.id_cargo
+                            into 
+                                v_fun                   
+                        from orga.vfuncionario_cargo_lugar vf
+                        left join orga.tcargo car on car.id_cargo = vf.id_cargo
+                        left join orga.tescala_salarial esc on esc.id_escala_salarial = car.id_escala_salarial
+                        left join orga.tcategoria_salarial cat on cat.id_categoria_salarial = esc.id_categoria_salarial
+                        left join oip.tanexo1 anex on anex.id_escala_salarial = esc.id_escala_salarial
+                        where vf.id_funcionario = v_values::json->>'id_funcionario'           
+                            and cat.codigo = 'SUPER';
                     
                     if v_fun.id_funcionario is not null then 
                     
                       ---controlar funcionario existe                
-                      if exists(select 1 from oip.thoras_piloto where id_archivo_horas_piloto = v_gestion_pago.id_archivo_horas_piloto
+                        if exists(select 1 from oip.thoras_piloto where id_archivo_horas_piloto = v_gestion_pago.id_archivo_horas_piloto
                       			and id_funcionario = v_fun.id_funcionario )then 
                                 
-                              --Sentencia de la modificacion
-                              update oip.thoras_piloto set
-                              gestion = v_gestion,
-                              mes = v_periodo,
-                              ci = v_values::json->>'ci',
-                              horas_simulador_full = v_values::json->>'horas_simulador_full',
-                              horas_simulador_fix  =  v_values::json->>'horas_simulador_fix',
-                              id_usuario_mod = p_id_usuario,
-                              fecha_mod = now()
-                              where ci = v_values::json->>'ci' 
-                              		and id_funcionario = v_values::json->>'id_funcionario'
-                                    and id_archivo_horas_piloto = v_parametros.id_archivo_horas_piloto;
-                      else
+                            --Sentencia de la modificacion
+                            update oip.thoras_piloto set
+                            horas_simulador_full = v_values::json->>'horas_simulador_full',
+                            horas_simulador_fix  =  v_values::json->>'horas_simulador_fix',
+                            id_usuario_mod = p_id_usuario,
+                            fecha_mod = now()
+                            where ci = v_values::json->>'ci' 
+                                and id_funcionario = v_values::json->>'id_funcionario'
+                                and id_archivo_horas_piloto = v_gestion_pago.id_archivo_horas_piloto;
+                        else
                       
-                              --Sentencia de la insercion
-                              insert into oip.thoras_piloto(
-                              estado_reg,
-                              gestion,
-                              mes,
-                              ci,
-                              nombre_piloto,
-                              tipo_flota,
-                              horas_vuelo,
-                              id_archivo_horas_piloto,
-                              id_funcionario,
-                              estado,
-                              pic_sic,
-                              id_usuario_reg,
-                              fecha_reg,
-                              id_usuario_ai,
-                              usuario_ai,
-                              id_usuario_mod,
-                              fecha_mod
-                              ) values(
-                              'activo',
-                              v_rec.id_gestion,
-                              v_rec.id_periodo,
-                              v_fun.ci,
-                              v_fun.nombre_piloto,
-                              'sin_tf',
-                              'sin_car',
-                              v_gestion_pago.id_archivo_horas_piloto,
-                              v_fun_id_funcionario,
-                              v_fun.id_cargo,
-                              'activo',
-                              v_cargo,
-                              p_id_usuario,
-                              now(),
-                              v_parametros._id_usuario_ai,
-                              v_parametros._nombre_usuario_ai,
-                              null,
-                              null													
-                              ); 
+                            --Sentencia de la insercion
+                            insert into oip.thoras_piloto(
+                            estado_reg,
+                            gestion,
+                            mes,
+                            ci,
+                            nombre_piloto,
+                            tipo_flota,
+                            horas_vuelo,
+                            id_archivo_horas_piloto,
+                            id_funcionario,
+                            estado,
+                            pic_sic,
+                            id_cargo,
+                            id_usuario_reg,
+                            fecha_reg,
+                            id_usuario_ai,
+                            usuario_ai,
+                            id_usuario_mod,
+                            fecha_mod
+                            ) values(
+                            'activo',
+                            v_rec.id_gestion,
+                            v_rec.id_periodo,
+                            v_fun.ci,
+                            v_fun.nombre_piloto,
+                            v_fun.tipo_flota,
+                            0,
+                            v_gestion_pago.id_archivo_horas_piloto,
+                            v_fun.id_funcionario,
+                            'activo',
+                            v_fun.pic_sic,
+                            v_fun.id_cargo,
+                            p_id_usuario,
+                            now(),
+                            v_parametros._id_usuario_ai,
+                            v_parametros._nombre_usuario_ai,
+                            null,
+                            null													
+                            ); 
                       	end if;
                     end if;                              
             	end loop;
                   
                   update oip.tarchivo_horas_piloto set
-                  estado = 'registrado'
-                  where id_archivo_horas_piloto = v_pago_variable.id_archivo_horas_piloto; 
+                  estado = 'archivo_cargado'
+                  where id_archivo_horas_piloto = v_gestion_pago.id_archivo_horas_piloto; 
                   v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Actualizacion de datos con exito.');                                           
                   
                 else
@@ -639,63 +651,71 @@ BEGIN
                           v_horas_simu_fix  = v_values::json->>'horas_simulador_fix';                                              
 
                           -- datos funcionario 
-                          select fun.id_funcionario,
-                                 fun.desc_funcionario2 as nombre_piloto,
-                                 fun.ci,
-                                 fun.id_cargo
-                                into 
-                                 v_fun
-                          from orga.vfuncionario_cargo_lugar fun
-                          where fun.id_funcionario = v_id_funcionario;
+                          select
+                                 anex.pic_sic,
+                                 anex.tipo_flota,
+                                 vf.id_funcionario,
+                                 vf.desc_funcionario2 as nombre_piloto,
+                                 vf.ci,
+                                 vf.id_cargo
+                              into 
+                                 v_fun                   
+                          from orga.vfuncionario_cargo_lugar vf
+                          left join orga.tcargo car on car.id_cargo = vf.id_cargo
+                          left join orga.tescala_salarial esc on esc.id_escala_salarial = car.id_escala_salarial
+                          left join orga.tcategoria_salarial cat on cat.id_categoria_salarial = esc.id_categoria_salarial
+                          left join oip.tanexo1 anex on anex.id_escala_salarial = esc.id_escala_salarial
+                          where vf.id_funcionario = v_id_funcionario
+                              and cat.codigo = 'SUPER';
                                               
 
-      					  if v_fun.id_funcionario is not null then 
+      					if v_fun.id_funcionario is not null then 
                                 
-                                --Sentencia de la insercion
-                                insert into oip.thoras_piloto(
-                                estado_reg,
-                                gestion,
-                                mes,
-                                ci,
-                                nombre_piloto,
-                                tipo_flota,
-                                pic_sic,
-                                horas_vuelo,
-                                id_archivo_horas_piloto,
-                                id_funcionario,
-                                id_cargo,
-                                estado,
-                                horas_simulador_full,
-                                horas_simulador_fix,
-                                id_usuario_reg,
-                                fecha_reg,
-                                id_usuario_ai,
-                                usuario_ai,
-                                id_usuario_mod,
-                                fecha_mod
-                                ) values(
-                                'activo',
-                                v_gestion,
-                                v_periodo,
-								v_fun.ci,
-                                v_fun.nombre_piloto,
-                                'sin_tf',
-                                'sin_car',
-                                0,
-                                v_id_archivo_horas_piloto,
-                                v_id_funcionario,
-                                v_fun.id_cargo,
-                                'activo',
-                                v_horas_simu_full,
-                                v_horas_simu_fix,
-                                p_id_usuario,
-                                now(),
-                                v_parametros._id_usuario_ai,
-                                v_parametros._nombre_usuario_ai,
-                                null,
-                                null													
-                                );
-                          end if;
+                            --Sentencia de la insercion
+                            insert into oip.thoras_piloto(
+                            estado_reg,
+                            gestion,
+                            mes,
+                            ci,
+                            nombre_piloto,
+                            tipo_flota,
+                            pic_sic,
+                            horas_vuelo,
+                            id_archivo_horas_piloto,
+                            id_funcionario,
+                            id_cargo,
+                            estado,
+                            horas_simulador_full,
+                            horas_simulador_fix,
+                            id_usuario_reg,
+                            fecha_reg,
+                            id_usuario_ai,
+                            usuario_ai,
+                            id_usuario_mod,
+                            fecha_mod
+                            ) values(
+                            'activo',
+                            v_gestion,
+                            v_periodo,
+                            v_fun.ci,
+                            v_fun.nombre_piloto,
+                            v_fun.tipo_flota,
+                            v_fun.pic_sic,
+                            0,
+                            v_id_archivo_horas_piloto,
+                            v_id_funcionario,
+                            v_fun.id_cargo,
+                            'activo',
+                            v_horas_simu_full,
+                            v_horas_simu_fix,
+                            p_id_usuario,
+                            now(),
+                            v_parametros._id_usuario_ai,
+                            v_parametros._nombre_usuario_ai,
+                            null,
+                            null													
+                            );
+                        end if;
                     end loop;
                     
                   update oip.tarchivo_horas_piloto set
