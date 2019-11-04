@@ -354,6 +354,7 @@ BEGIN
                         from oip.thoras_piloto horpi
                         inner join oip.ttipo_flota tflo on tflo.tipo_flota = horpi.tipo_flota
                         where horpi.id_archivo_horas_piloto = v_parametros.id_archivo_horas_piloto
+                        and horpi.horas_vuelo > 40
         loop
         	
 			---validaciones inicio----------

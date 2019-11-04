@@ -46,7 +46,8 @@ DECLARE
     v_count							integer;
 	v_gestion_pago					record;		    
 	v_rec_esc    	    			record;
-	v_real_tipo_flota    		    varchar;    
+	v_real_tipo_flota    		    varchar;  
+    v_real_pic_sic					varchar;      
 BEGIN
 
     v_nombre_funcion = 'oip.ft_archivo_horas_piloto_ime';
@@ -427,6 +428,12 @@ BEGIN
                                 	v_real_tipo_flota = v_tipo_flota;
                                 end if; 
 
+                                if v_rec_esc.pic_sic <> v_cargo then 
+                                	v_real_pic_sic =  v_rec_esc.pic_sic;
+                                else
+                                	v_real_pic_sic =  v_cargo;                                	
+                                end if;
+
                             --verificar si existe funcionario en el periodo
                         if exists(select 1 from oip.thoras_piloto where id_archivo_horas_piloto = v_gestion_pago.id_archivo_horas_piloto
                                     and id_funcionario = v_id_funcionario )then
@@ -471,7 +478,7 @@ BEGIN
                                 v_rec_esc.id_funcionario,
                                 v_rec_esc.id_cargo,
                                 'activo',
-                                v_cargo,
+                                v_real_pic_sic,
                                 p_id_usuario,
                                 now(),
                                 v_parametros._id_usuario_ai,
@@ -559,7 +566,13 @@ BEGIN
                                 	v_real_tipo_flota = v_rec_esc.tipo_flota;
                                 else 
                                 	v_real_tipo_flota = v_tipo_flota;
-                                end if;    
+                                end if;
+
+                                if v_rec_esc.pic_sic <> v_cargo then 
+                                	v_real_pic_sic =  v_rec_esc.pic_sic;
+                                else
+                                	v_real_pic_sic =  v_cargo;                                	
+                                end if;                                     
 
                             --Sentencia de la insercion
                             insert into oip.thoras_piloto(
@@ -593,7 +606,7 @@ BEGIN
                             v_rec_esc.id_funcionario,
                             v_rec_esc.id_cargo,
                             'activo',
-                            v_cargo,
+                            v_real_pic_sic,
                             p_id_usuario,
                             now(),
                             v_parametros._id_usuario_ai,
