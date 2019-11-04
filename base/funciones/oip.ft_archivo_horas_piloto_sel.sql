@@ -137,7 +137,8 @@ BEGIN
                           hopi.factor_esfuerzo,
                           hopi.monto_horas_vuelo,
                           hopi.monto_horas_simulador_full,
-                          hopi.monto_horas_simulador_fix
+                          hopi.monto_horas_simulador_fix,
+                          hopi.tipo_flota
                     from oip.tarchivo_horas_piloto arhopi
                     inner join oip.thoras_piloto hopi on hopi.id_archivo_horas_piloto = arhopi.id_archivo_horas_piloto
                     inner join param.tgestion ges on ges.id_gestion = arhopi.id_gestion

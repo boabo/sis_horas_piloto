@@ -201,4 +201,33 @@ ALTER TABLE oip.thoras_piloto
 
 ALTER TABLE oip.thoras_piloto
   ALTER COLUMN monto_horas_simulador_fix TYPE NUMERIC(20,10);  
-/***********************************F-SCP-BVP-HORAS-PILOTO-0-21/10/2019****************************************/  
+/***********************************F-SCP-BVP-HORAS-PILOTO-0-21/10/2019****************************************/
+
+/***********************************I-SCP-BVP-HORAS-PILOTO-0-01/11/2019****************************************/
+CREATE TABLE oip.tacumulado_copiloto_corto_alcance (
+  id_piloto_corto_alcance SERIAL,
+  horas_vuelo INTEGER NOT NULL,
+  costo_hora NUMERIC(20,10),
+  acumulado NUMERIC(20,10),
+  salario_acumulado NUMERIC(20,10),
+  CONSTRAINT tacumulado_copiloto_corto_alcance_pkey PRIMARY KEY(id_piloto_corto_alcance)
+) INHERITS (pxp.tbase)
+WITH (oids = false);
+
+ALTER TABLE oip.tacumulado_copiloto_corto_alcance
+  OWNER TO postgres;
+
+CREATE TABLE oip.tacumulado_piloto_corto_alcance (
+  id_piloto_corto_alcance SERIAL,
+  horas_vuelo INTEGER NOT NULL,
+  costo_hora NUMERIC(20,10),
+  acumulado NUMERIC(20,10),
+  salario_acumulado NUMERIC(20,10),
+  CONSTRAINT tacumulado_piloto_corto_pkey PRIMARY KEY(id_piloto_corto_alcance)
+) INHERITS (pxp.tbase)
+WITH (oids = false);
+
+ALTER TABLE oip.tacumulado_piloto_corto_alcance
+  OWNER TO postgres;
+
+/***********************************F-SCP-BVP-HORAS-PILOTO-0-01/11/2019****************************************/

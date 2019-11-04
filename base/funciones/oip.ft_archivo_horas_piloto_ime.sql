@@ -25,7 +25,7 @@ DECLARE
 	v_nro_requerimiento    			integer;
 	v_parametros           			record;
 	v_id_requerimiento     			integer;
-	v_resp		            		varchar;
+	v_resp		            		varchar;    
 	v_nombre_funcion        		text;
 	v_mensaje_error         		text;
 	v_id_archivo_horas_piloto		integer;
@@ -131,7 +131,7 @@ BEGIN
 
 	/*********************************    
  	#TRANSACCION:  'OIP_ARHOPI_ELI'
- 	#DESCRIPCION:	Eliminacion de registros
+ 	#DESCRIPCION:	Eliminacion de registros del excel cargado
  	#AUTOR:		breydi.vasquez	
  	#FECHA:		20-09-2019 13:42:10
 	***********************************/
@@ -427,6 +427,7 @@ BEGIN
                                 	v_real_tipo_flota = v_tipo_flota;
                                 end if; 
 
+                            --verificar si existe funcionario en el periodo
                         if exists(select 1 from oip.thoras_piloto where id_archivo_horas_piloto = v_gestion_pago.id_archivo_horas_piloto
                                     and id_funcionario = v_id_funcionario )then
                         
@@ -449,6 +450,7 @@ BEGIN
                                 horas_vuelo,
                                 id_archivo_horas_piloto,
                                 id_funcionario,
+                                id_cargo,
                                 estado,
                                 pic_sic,
                                 id_usuario_reg,
@@ -461,12 +463,12 @@ BEGIN
                                 'activo',
                                 v_rec.id_gestion,
                                 v_rec.id_periodo,
-                                v_fv_rec_escun.ci,
+                                v_rec_esc.ci,
                                 v_rec_esc.nombre_piloto,
                                 v_real_tipo_flota,
                                 v_horas_vuelo,
-                                v_id_archivo_horas_piloto,
-                                v_id_funcionario,
+                                v_gestion_pago.id_archivo_horas_piloto,
+                                v_rec_esc.id_funcionario,
                                 v_rec_esc.id_cargo,
                                 'activo',
                                 v_cargo,
@@ -588,7 +590,7 @@ BEGIN
                             v_real_tipo_flota,
                             v_horas_vuelo,
                             v_id_archivo_horas_piloto,
-                            v_id_funcionario,
+                            v_rec_esc.id_funcionario,
                             v_rec_esc.id_cargo,
                             'activo',
                             v_cargo,

@@ -46,8 +46,7 @@ BEGIN
         	insert into oip.tlog_estado(
 			estado_reg,
 			id_archivo_horas_piloto,
-			accion,
-			columnas_afectadas,
+			accion,			
 			estado,
 			nro_modificacion,
 			id_usuario_reg,
@@ -59,8 +58,7 @@ BEGIN
           	) values(
 			'activo',
 			v_parametros.id_archivo_horas_piloto,
-			v_parametros.accion,
-			v_parametros.columnas_afectadas,
+			v_parametros.accion,			
 			v_parametros.estado,
 			v_parametros.nro_modificacion,
 			p_id_usuario,

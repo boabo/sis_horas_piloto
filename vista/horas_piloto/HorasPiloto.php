@@ -17,7 +17,14 @@ Phx.vista.HorasPiloto=Ext.extend(Phx.gridInterfaz,{
     	//llama al constructor de la clase padre
 		Phx.vista.HorasPiloto.superclass.constructor.call(this,config);
 		this.init();
-        this.iniciarEventos();		
+        this.iniciarEventos();
+        this.addButton('btnPiHorasVuelo', {                
+            text: 'Rep. Pilotos Horas Vuelo',            
+            iconCls:'bexcel',
+            disabled: true,
+            handler:this.PilHorasVuelo,
+            tooltip: '<b>Finaliza</b><br/>Historial de cambios de estado.'
+        });        		
 	},
 			
 	Atributos:[
@@ -164,7 +171,7 @@ Phx.vista.HorasPiloto=Ext.extend(Phx.gridInterfaz,{
                     }else if (value == 'mediano_alcance'){
                         return 'Mediano Alcance';
                     }else if (value == 'corto_alcance'){
-                        return 'Corto Alacance';
+                        return 'Corto Alcance';
                     }
                 }
 			},
@@ -589,9 +596,19 @@ Phx.vista.HorasPiloto=Ext.extend(Phx.gridInterfaz,{
         },this);
         
         
-    }
-
-
+    },
+    PilHorasVuelo: function (){
+            var data = this.maestro.id_archivo_horas_piloto;            
+            Phx.CP.loadingShow();					 				
+            Ext.Ajax.request({
+                            url:'../../sis_horas_piloto/control/ArchivoHorasPiloto/reportePiHorasVuelo',
+                            params:{id_archivo_horas_piloto: data},
+                            success: this.successExport,
+                            failure: this.conexionFailure,
+                            timeout:this.timeout,
+                            scope:this
+            });							
+    }    
 })
 </script>
 		

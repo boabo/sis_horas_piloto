@@ -8,6 +8,7 @@
 */
 include_once(dirname(__FILE__).'/../../lib/lib_general/ExcelInput.php');
 include_once(dirname(__FILE__).'/../reportes/ReportePagoVariableXLS.php');
+include_once(dirname(__FILE__).'/../reportes/ReportePiHorasVueloXLS.php');
 
 class ACTArchivoHorasPiloto extends ACTbase{    
 			
@@ -204,6 +205,29 @@ class ACTArchivoHorasPiloto extends ACTbase{
         $this->mensajeExito->setArchivoGenerado($nombreArchivo);
         $this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());	
     }
+
+    function reportePiHorasVuelo(){
+        $this->objParam->getParametro('id_archivo_horas_piloto') != '' && $this->objParam->addFiltro("arhopi.id_archivo_horas_piloto = ".$this->objParam->getParametro('id_archivo_horas_piloto'));
+
+        $this->objFunc = $this->create('MODArchivoHorasPiloto');
+        $this->res = $this->objFunc->reportePagoVariable($this->objParam);
+        
+        $nombreArchivo = uniqid(md5(session_id()).'[Reporte Horas Vuelo').'.xls';
+
+        $this->objParam->addParametro('orientacion','L');
+        $this->objParam->addParametro('tamano','LETTER');
+        $this->objParam->addParametro('nombre_archivo',$nombreArchivo);
+        $this->objParam->addParametro('titulo_archivo','Reporte Pago Variable');
+
+        $reporte = new ReportePiHorasVueloXLS($this->objParam);
+        $reporte->setDatos($this->res->datos);
+        $reporte->generarReporte();
+        $this->mensajeExito=new Mensaje();
+        $this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado',
+            'Se generó con éxito el reporte: '.$nombreArchivo,'control');
+        $this->mensajeExito->setArchivoGenerado($nombreArchivo);
+        $this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());	
+    }    
 }
 
 ?>

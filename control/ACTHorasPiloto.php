@@ -45,11 +45,10 @@ class ACTHorasPiloto extends ACTbase{
 	}
 						
 	function eliminarHorasPiloto(){
-			$this->objFunc=$this->create('MODHorasPiloto');	
+		$this->objFunc=$this->create('MODHorasPiloto');	
 		$this->res=$this->objFunc->eliminarHorasPiloto($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
-	}
-			
+    }     			
 }
 
 ?>

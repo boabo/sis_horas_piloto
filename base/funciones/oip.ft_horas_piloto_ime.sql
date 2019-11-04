@@ -249,6 +249,9 @@ BEGIN
                           tipo_flota,
                           pic_sic,
                           estado,
+                          horas_simulador_fix,
+                          horas_simulador_full,
+                          horas_vuelo,                          
                           id_usuario_reg,
                           fecha_reg,
                           id_usuario_ai,
@@ -267,6 +270,9 @@ BEGIN
                           v_fun.tipo_flota,
                           v_fun.pic_sic,
                           'activo',
+                          v_parametros.horas_simulador_fix,
+                          v_parametros.horas_simulador_full,
+                          0,                          
                           p_id_usuario,
                           now(),
                           v_parametros._id_usuario_ai,
@@ -343,7 +349,8 @@ BEGIN
                            tflo.horas_base,
                            tflo.maximo_horas,
                            horpi.id_funcionario,
-                           horpi.pic_sic            
+                           horpi.pic_sic,
+                           horpi.id_cargo            
                         from oip.thoras_piloto horpi
                         inner join oip.ttipo_flota tflo on tflo.tipo_flota = horpi.tipo_flota
                         where horpi.id_archivo_horas_piloto = v_parametros.id_archivo_horas_piloto
@@ -386,9 +393,11 @@ BEGIN
 	            raise exception 'Existe diferencia haber basico: escala salarial: %  y anexo1: %',v_rec_esc.haber_basico, v_rec_esc.remuneracion_basica;
             end if;
                     	        
-        
-        ---validaciones fin-------
-        
+          -- exclucion a funcionarioa operativos 
+          if (v_rec.id_cargo not in (17426,17401,18249,17827,17466) ) then         
+
+            ---validaciones fin-------
+            ---inicio de calculos-----
         	-- Horas Vuelo
                                        
             if v_rec.horas_vuelo <= v_rec.horas_base then 
@@ -419,9 +428,30 @@ BEGIN
             V_C = v_costo_sim_fix * v_horas_simulador.p_resp_fix;
             
             -- Formula Pago Variable        
-            v_pago_variable = ( v_A + ( coalesce( V_B, 0 ) +  coalesce( V_C, 0 ) ));
+            v_pago_variable = ( v_A + ( coalesce( round(V_B), 0 ) +  coalesce( round(V_C), 0 ) ));
                     
-
+            --recupera pago variable de tabla, antes de modificacion de reglamento para corto_alcance CRJ    
+                
+            if v_rec.tipo_flota = 'corto_alcance' and v_rec.horas_base = 40  and v_rec.pic_sic = 'PIC' then
+            
+                v_pago_variable = 0.00;
+                
+                select pi.acumulado
+                    into v_pago_variable
+                from oip.tacumulado_piloto_corto_alcance pi
+                where pi.horas_vuelo = v_rec.horas_vuelo;
+                
+                
+            elsif v_rec.tipo_flota = 'corto_alcance' and v_rec.horas_base = 40  and v_rec.pic_sic = 'SIC' then
+                
+                v_pago_variable = 0.00;
+                
+                select pi.acumulado
+                    into v_pago_variable
+                from oip.tacumulado_copiloto_corto_alcance pi
+                where pi.horas_vuelo = v_rec.horas_vuelo;              
+                
+            end if; 
             
             if ( (v_rec_esc.haber_basico + v_pago_variable) between v_rec_esc.remuneracion_basica and v_rec_esc.remuneracion_maxima ) then 
                 ------- Actualizacion de datos
@@ -429,16 +459,18 @@ BEGIN
                 factor_esfuerzo = v_factor_esfuerzo,
                 pago_variable   = v_pago_variable,
                 monto_horas_vuelo = V_A,
-                monto_horas_simulador_full = coalesce(V_B, 0),
-                monto_horas_simulador_fix = coalesce(V_C, 0),
+                monto_horas_simulador_full = coalesce(round(V_B), 0),
+                monto_horas_simulador_fix = coalesce(round(V_C), 0),
                 horas_simulador_full_efectivas = coalesce(v_horas_simulador.p_resp_full, 0),
                 horas_simulador_fix_efectivas = coalesce(v_horas_simulador.p_resp_fix, 0)
                 where id_horas_piloto = v_rec.id_horas_piloto; 
 			else 
-            	raise exception 'La maxima remuneracion para el funcionario % es de: %, y su haber basico mas su pago variable 
-                		superan la remuneracion maxima de % ', v_rec.nombre_piloto, (v_rec_esc.haber_basico + v_pago_variable),  v_rec_esc.remuneracion_maxima;                
+                raise exception 'La maxima remuneracion para el funcionario % es de: %, y su haber basico de % 
+                mas su pago variable de %, hacen un total de %
+                superando la remuneracion maxima', v_rec.nombre_piloto ,v_rec_esc.remuneracion_maxima, v_rec_esc.haber_basico,  
+                round(v_pago_variable,2), (v_rec_esc.haber_basico + round(v_pago_variable,2)); 
 			end if;       
-                                                            
+          end if;                                                    
  
                        
         end loop; 
