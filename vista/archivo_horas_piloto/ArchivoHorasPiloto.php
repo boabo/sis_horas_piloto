@@ -94,15 +94,6 @@ Phx.vista.ArchivoHorasPiloto=Ext.extend(Phx.gridInterfaz,{
                 tooltip: '<b>Cargar Archivo</b><br/>Carga un Archivo del tipo Excel.'
             }
         );
-        
-        this.addButton('btnCalPagoVariable', {                
-            text: 'Calcular Pago Variable',
-            //iconCls: 'bcalculator',
-            iconCls:'procesData',
-            disabled: true,
-            handler:this.calPagoVariable,
-            tooltip: '<b>Medicion y Calculo</b><br/>Del Pago Variable'
-        });
 
         this.addButton('btnborrar_archivo', {                
             text: 'Borrar Archivo Excel',
@@ -111,7 +102,17 @@ Phx.vista.ArchivoHorasPiloto=Ext.extend(Phx.gridInterfaz,{
             disabled: true,
             handler:this.borrarDetalle,
             tooltip: '<b>Borrar</b><br/>Elimina los datos Cargados del excel'
-        }); 
+        });
+
+        this.addButton('btnCalPagoVariable', {                
+            text: 'Calcular Pago Variable',
+            //iconCls: 'bcalculator',
+            iconCls:'procesData',
+            disabled: true,
+            handler:this.calPagoVariable,
+            tooltip: '<b>Medicion y Calculo</b><br/>Del Pago Variable'
+        });
+ 
 
         this.addButton('btnborrar_calculo', {                
             text: 'Borrar Calculo',
@@ -502,8 +503,8 @@ Phx.vista.ArchivoHorasPiloto=Ext.extend(Phx.gridInterfaz,{
 		
 	],
 	sortInfo:{
-		field: 'id_archivo_horas_piloto',
-		direction: 'ASC'
+		field: 'id_periodo',
+		direction: 'DESC'
 	},
 	bdel: false,
 	bsave: false,
@@ -535,7 +536,7 @@ Phx.vista.ArchivoHorasPiloto=Ext.extend(Phx.gridInterfaz,{
         if ( data.estado == 'registrado' ) {            
             this.getBoton('btnFinPagoVariable').disable();
             this.getBoton('btnborrar_archivo').disable();
-            this.getBoton('btnCalPagoVariable').disable();
+            this.getBoton('btnCalPagoVariable').enable();
             this.getBoton('btnRepPagoVariable').disable();
             this.getBoton('btnborrar_calculo').disable();
             this.getBoton('btnLogPagoVariable').disable();
@@ -603,10 +604,14 @@ Phx.vista.ArchivoHorasPiloto=Ext.extend(Phx.gridInterfaz,{
         Phx.CP.loadingShow();
         var d = this.sm.getSelected().data;
         var NumSelect = this.sm.getCount();
+        var sin_excel = false;
         if(NumSelect != 0){
+            if (d.archivo == null || d.archivo == ''){
+                sin_excel = true;
+            }
             Ext.Ajax.request({            
                 url:'../../sis_horas_piloto/control/ArchivoHorasPiloto/eliminarDatosCalculados',
-                params:{id_archivo_horas_piloto: d.id_archivo_horas_piloto, ruta_excel: d.archivo},
+                params:{id_archivo_horas_piloto: d.id_archivo_horas_piloto, ruta_excel: d.archivo, sin_excel: sin_excel},
                 success: (resp) => {
                     Phx.CP.loadingHide();
                     var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
@@ -650,24 +655,33 @@ Phx.vista.ArchivoHorasPiloto=Ext.extend(Phx.gridInterfaz,{
 
     //Llamada a funcion para calular el pago de variable a pilotos
     calPagoVariable: function (){
-        Phx.CP.loadingShow();
+        
         var rec = this.sm.getSelected().data;
         var NumSelect = this.sm.getCount();
         if(NumSelect != 0){
-            Ext.Ajax.request({
-                url:'../../sis_horas_piloto/control/ArchivoHorasPiloto/calculoPagoVariable',
-                params:{id_archivo_horas_piloto: rec.id_archivo_horas_piloto},
-                success: (resp) => {
-                    Phx.CP.loadingHide();
-                    var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-                    if(!reg.ROOT.error){
-                        this.reload();
-                    }                
-                },
-                failure: this.conexionFailure,
-                timeout:this.timeout,
-                scope:this
-            });
+
+            var succ = false;
+
+            if (rec.archivo == null || rec.archivo == '') {
+                succ = window.confirm('Se procesaran los datos sin el archivo excel de las horas simulador de pilotos y copilotos \n. Esta seguro de continuar');
+            }else { succ = true}
+            if (succ){
+                Phx.CP.loadingShow();
+                Ext.Ajax.request({
+                    url:'../../sis_horas_piloto/control/ArchivoHorasPiloto/calculoPagoVariable',
+                    params:{id_archivo_horas_piloto: rec.id_archivo_horas_piloto},
+                    success: (resp) => {
+                        Phx.CP.loadingHide();
+                        var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+                        if(!reg.ROOT.error){
+                            this.reload();
+                        }                
+                    },
+                    failure: this.conexionFailure,
+                    timeout:this.timeout,
+                    scope:this
+                });
+            }
         }else{
             Ext.MessageBox.alert('Alerta', 'Antes debe seleccionar un item.');
         }    

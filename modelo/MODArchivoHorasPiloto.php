@@ -131,6 +131,7 @@ class MODArchivoHorasPiloto extends MODbase{
 		//Define los parametros para la funcion
 		$this->setParametro('id_archivo_horas_piloto','id_archivo_horas_piloto','int4');
         $this->setParametro('datosCalculados','datosCalculados','varchar');
+        $this->setParametro('sin_excel','sin_excel','boolean');
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();

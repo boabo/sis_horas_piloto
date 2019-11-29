@@ -47,7 +47,8 @@ DECLARE
 	v_gestion_pago					record;		    
 	v_rec_esc    	    			record;
 	v_real_tipo_flota    		    varchar;  
-    v_real_pic_sic					varchar;      
+    v_real_pic_sic					varchar; 
+    v_estado						varchar;         
 BEGIN
 
     v_nombre_funcion = 'oip.ft_archivo_horas_piloto_ime';
@@ -201,9 +202,15 @@ BEGIN
               id_usuario_mod = p_id_usuario,
               fecha_mod = now()
               where id_archivo_horas_piloto = v_parametros.id_archivo_horas_piloto;
-              
+
+               if v_parametros.sin_excel = true then
+	              v_estado = 'registrado';
+               else
+	              v_estado = 'archivo_cargado';
+               end if;
+
               update oip.tarchivo_horas_piloto set
-              estado = 'archivo_cargado',
+              estado = v_estado,
               pago_total = null
               where id_archivo_horas_piloto = v_parametros.id_archivo_horas_piloto;
               
@@ -264,7 +271,8 @@ BEGIN
 		begin
 			--Sentencia de la modificacion
 			update oip.tarchivo_horas_piloto set
-            estado = 'finalizado'
+            estado = 'finalizado',
+            cerrado = 'si'
 			where id_archivo_horas_piloto=v_parametros.id_archivo_horas_piloto;
                           
               
@@ -374,7 +382,7 @@ BEGIN
             where ges.gestion = v_gestion
             and per.periodo = v_periodo;
 
-			select id_periodo, id_archivo_horas_piloto
+			select id_periodo, id_archivo_horas_piloto, estado
             	into  v_gestion_pago
             from oip.tarchivo_horas_piloto 
             where id_periodo = v_rec.id_periodo 
@@ -384,7 +392,8 @@ BEGIN
             if  v_gestion_pago.id_periodo is not null then
             
              	v_json = v_parametros.pilotos:: JSON->>'pilotos'; -- json con los datos de los pilotos 
-      			
+
+      			if v_gestion_pago.estado in ('registrado') then      			
                       for v_registros_json in SELECT json_array_elements(v_json :: JSON) loop
 
                           v_values 		   = v_registros_json.json_array_elements::json;                                                  
@@ -490,7 +499,16 @@ BEGIN
                       end if;
     			        
                    	 end loop;
-                    	            
+                else
+                   	if v_gestion_pago.estado = 'archivo_cargado' then 
+                        raise exception 'El pago variable para el mes de %, se encuentra cargado con el archivo Excel de horas piloto, no puede relizar nuevamente los registros', v_rec.mes;
+                    elsif v_gestion_pago.estado = 'calculado' then 
+                        raise exception 'El pago variable para el mes de %, se encuentra en proceso de calculo, no puede realizar nuevamente los registros', v_rec.mes;                    
+                    elsif v_gestion_pago.estado = 'finalizado' then 
+                        raise exception 'El pago variable para el mes de %, se encuentra finalizado, no puede realizar nuevamente los registros', v_rec.mes;
+                   end if;  
+                 end if;   
+            -- caso no este registrado                    	            
             else 
             
                   --Sentencia de la insercion cabecera

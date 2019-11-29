@@ -382,16 +382,19 @@ BEGIN
             end if;
             
             if v_rec_esc.pic_sic <> v_rec.pic_sic then
-            	raise exception 'Existe diferencia de cargo para el funcionario %,Dentro la escala salarial tiene cargo: %',v_rec_esc.desc_funcionario2, v_rec_esc.nombre;
+            	raise exception 'Existe diferencia de cargo para el funcionario %, la informacion cargada del sistema sicno, es de tipo %,
+                 y dentro la escala salarial es %',coalesce(v_rec_esc.desc_funcionario2,v_rec.nombre_piloto),
+                 v_rec.pic_sic, v_rec_esc.pic_sic;            	
             end if;
             
             if v_rec_esc.tipo_flota <> v_rec.tipo_flota then 
-            	raise exception 'Existe diferencia de tipo flota para el funcionario %',v_rec_esc.desc_funcionario2;
+            	raise exception 'Existe diferencia de tipo flota para el funcionario %',coalesce(v_rec_esc.desc_funcionario2,v_rec.nombre_piloto);
             end if;
             
             -- control haber basico diferencias 
             if v_rec_esc.haber_basico <> v_rec_esc.remuneracion_basica then
-	            raise exception 'Existe diferencia haber basico: escala salarial: %  y anexo1: %',v_rec_esc.haber_basico, v_rec_esc.remuneracion_basica;
+	            raise exception 'Existe diferencia haber basico: escala salarial: %  y anexo1: % 
+                , para el funcionario: %',v_rec_esc.haber_basico, v_rec_esc.remuneracion_basica, coalesce(v_rec_esc.desc_funcionario2,v_rec.nombre_piloto);
             end if;
                     	        
           -- exclucion a funcionarioa operativos 
@@ -442,7 +445,9 @@ BEGIN
                 from oip.tacumulado_piloto_corto_alcance pi
                 where pi.horas_vuelo = v_rec.horas_vuelo;
                 
-                
+                V_A = 0.00;
+                V_A = v_pago_variable;
+
             elsif v_rec.tipo_flota = 'corto_alcance' and v_rec.horas_base = 40  and v_rec.pic_sic = 'SIC' then
                 
                 v_pago_variable = 0.00;
@@ -450,7 +455,10 @@ BEGIN
                 select pi.acumulado
                     into v_pago_variable
                 from oip.tacumulado_copiloto_corto_alcance pi
-                where pi.horas_vuelo = v_rec.horas_vuelo;              
+                where pi.horas_vuelo = v_rec.horas_vuelo; 
+                
+                V_A = 0.00;
+                V_A = v_pago_variable;                             
                 
             end if; 
             
@@ -466,7 +474,7 @@ BEGIN
                 horas_simulador_fix_efectivas = coalesce(v_horas_simulador.p_resp_fix, 0)
                 where id_horas_piloto = v_rec.id_horas_piloto; 
 			else 
-                raise exception 'La maxima remuneracion para el funcionario % es de: %, y su haber basico de % 
+                raise exception 'La maxima remuneracion para el funcionario % es de: %, y su haber basico es de % 
                 mas su pago variable de %, hacen un total de %
                 superando la remuneracion maxima', v_rec.nombre_piloto ,v_rec_esc.remuneracion_maxima, v_rec_esc.haber_basico,  
                 round(v_pago_variable,2), (v_rec_esc.haber_basico + round(v_pago_variable,2)); 
