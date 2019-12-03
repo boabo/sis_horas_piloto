@@ -407,8 +407,8 @@ BEGIN
             if v_rec.horas_vuelo <= v_rec.horas_base then 
             	v_horas_adicionales = 0;
             else 
-                if (( v_rec.horas_vuelo - v_rec.horas_base) >= v_rec.maximo_horas ) then 
-                        v_horas_adicionales = v_rec.maximo_horas;
+                if ( v_rec.horas_vuelo  >= v_rec.maximo_horas ) then 
+                        v_horas_adicionales = 40;
                 else 
                         v_horas_adicionales = v_rec.horas_vuelo - v_rec.horas_base;
                 end if;
