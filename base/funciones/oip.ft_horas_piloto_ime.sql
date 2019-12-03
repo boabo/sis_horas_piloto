@@ -497,7 +497,7 @@ BEGIN
                 raise exception 'La maxima remuneracion para el funcionario % es de: %, y su haber basico es de % 
                 mas su pago variable de %, hacen un total de %
                 superando la remuneracion maxima', v_rec.nombre_piloto ,v_rec_esc.remuneracion_maxima, v_rec_esc.haber_basico,  
-                round(v_pago_variable,2), (v_rec_esc.haber_basico + round(v_pago_variable,2)); 
+                round(v_pago_variable), (v_rec_esc.haber_basico + round(v_pago_variable)); 
 			end if;       
           end if;                                                    
  
