@@ -440,11 +440,22 @@ BEGIN
             
                 v_pago_variable = 0.00;
                 
-                select pi.acumulado
-                    into v_pago_variable
-                from oip.tacumulado_piloto_corto_alcance pi
-                where pi.horas_vuelo = v_rec.horas_vuelo;
-                
+                --caso horas vuelo sea mayor a 70 maximo establecido por reglamento 
+                --modificado breyi vasquez (03/12/2019)
+                if v_rec.horas_vuelo > 70 then 
+                    select pi.acumulado
+                        into v_pago_variable
+                    from oip.tacumulado_piloto_corto_alcance pi
+                    where pi.horas_vuelo = 70;
+                else
+
+                    select pi.acumulado
+                        into v_pago_variable
+                    from oip.tacumulado_piloto_corto_alcance pi
+                    where pi.horas_vuelo = v_rec.horas_vuelo;
+
+                end if;
+
                 V_A = 0.00;
                 V_A = v_pago_variable;
 
@@ -452,11 +463,20 @@ BEGIN
                 
                 v_pago_variable = 0.00;
                 
-                select pi.acumulado
-                    into v_pago_variable
-                from oip.tacumulado_copiloto_corto_alcance pi
-                where pi.horas_vuelo = v_rec.horas_vuelo; 
-                
+                --caso horas vuelo sea mayor a 70 maximo establecido por reglamento 
+                --modificado breyi vasquez (03/12/2019)
+                if v_rec.horas_vuelo > 70 then 
+                    select pi.acumulado
+                        into v_pago_variable
+                    from oip.tacumulado_copiloto_corto_alcance pi
+                    where pi.horas_vuelo = 70; 
+                else 
+                    select pi.acumulado
+                        into v_pago_variable
+                    from oip.tacumulado_copiloto_corto_alcance pi
+                    where pi.horas_vuelo = v_rec.horas_vuelo;                 
+                end if;
+
                 V_A = 0.00;
                 V_A = v_pago_variable;                             
                 
