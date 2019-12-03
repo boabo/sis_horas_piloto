@@ -482,7 +482,7 @@ BEGIN
                 
             end if; 
             
-            if ( (v_rec_esc.haber_basico + v_pago_variable) between v_rec_esc.remuneracion_basica and v_rec_esc.remuneracion_maxima ) then 
+            if ( (v_rec_esc.haber_basico + round(v_pago_variable)) between v_rec_esc.remuneracion_basica and v_rec_esc.remuneracion_maxima ) then 
                 ------- Actualizacion de datos
                 update oip.thoras_piloto set 
                 factor_esfuerzo = v_factor_esfuerzo,
