@@ -67,7 +67,8 @@ Phx.vista.ArchivoHorasPiloto=Ext.extend(Phx.gridInterfaz,{
                     var reg = Ext.decode(Ext.util.Format.trim(resp.responseText));                    
                     this.cmbGestion.setValue(reg.ROOT.datos.id_gestion);
                     this.cmbGestion.setRawValue(fecha.getFullYear());
-                    this.store.baseParams.id_gestion = reg.ROOT.datos.id_gestion;                    
+                    this.store.baseParams.id_gestion = reg.ROOT.datos.id_gestion;
+                    this.load({params: {start: 0, limit:this.tam_pag}});                                       
                 },
                 failure: this.conexionFailure,
                 timeout: this.timeout,
