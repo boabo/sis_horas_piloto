@@ -12,11 +12,11 @@ $body$
  DESCRIPCION:   Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'oip.thoras_piloto'
  AUTOR: 		 (breydi.vasquez)
  FECHA:	        20-09-2019 13:43:39
- COMENTARIOS:	
+ COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 #ISSUE				FECHA				AUTOR				DESCRIPCION
- #0				20-09-2019 13:43:39								Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'oip.thoras_piloto'	
+ #0				20-09-2019 13:43:39								Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'oip.thoras_piloto'
  #
  ***************************************************************************/
 
@@ -40,10 +40,10 @@ DECLARE
     v_pago_variable				numeric;
     v_gestion					integer;
     v_periodo					integer;
-    v_count						integer; 
+    v_count						integer;
     v_pago_total				numeric;
     v_json						varchar;
-    v_registros_json			record; 
+    v_registros_json			record;
     v_values					varchar;
     v_rec_esc					record;
     v_gestion_pago				record;
@@ -53,33 +53,33 @@ DECLARE
     v_horas_simu_fix			integer;
     V_A							numeric;
     V_B							numeric;
-    V_C							numeric;    
-			    
+    V_C							numeric;
+
 BEGIN
 
     v_nombre_funcion = 'oip.ft_horas_piloto_ime';
     v_parametros = pxp.f_get_record(p_tabla);
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'OIP_HOPILO_INS'
  	#DESCRIPCION:	Insercion de registros
- 	#AUTOR:		breydi.vasquez	
+ 	#AUTOR:		breydi.vasquez
  	#FECHA:		20-09-2019 13:43:39
 	***********************************/
 
 	if(p_transaccion='OIP_HOPILO_INS')then
-					
+
         begin
-        
-            
-            select fun.id_funcionario 
+
+
+            select fun.id_funcionario
             	into
 	               v_id_funcionario
             from orga.vfuncionario fun
             where fun.ci = v_parametros.ci;
 
-		 if v_id_funcionario is null then 
-         	raise exception 'La persona % no es funcionario de la empresa Boa.',v_parametros.nombre_piloto; 
+		 if v_id_funcionario is null then
+         	raise exception 'La persona % no es funcionario de la empresa Boa.',v_parametros.nombre_piloto;
          end if;
         	--Sentencia de la insercion
         	insert into oip.thoras_piloto(
@@ -121,11 +121,11 @@ BEGIN
 			v_parametros._id_usuario_ai,
 			v_parametros._nombre_usuario_ai,
 			null,
-			null													
-			)RETURNING id_horas_piloto into v_id_horas_piloto;			
-	            
+			null
+			)RETURNING id_horas_piloto into v_id_horas_piloto;
+
 			--Definicion de la respuesta
-			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Detalle Calculo sueldo piloto almacenado(a) con exito (id_horas_piloto'||v_id_horas_piloto||')'); 
+			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Detalle Calculo sueldo piloto almacenado(a) con exito (id_horas_piloto'||v_id_horas_piloto||')');
             v_resp = pxp.f_agrega_clave(v_resp,'id_horas_piloto',v_id_horas_piloto::varchar);
 
             --Devuelve la respuesta
@@ -133,17 +133,17 @@ BEGIN
 
 		end;
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'OIP_HOPILO_MOD'
  	#DESCRIPCION:	Modificacion de registros
- 	#AUTOR:		breydi.vasquez	
+ 	#AUTOR:		breydi.vasquez
  	#FECHA:		20-09-2019 13:43:39
 	***********************************/
 
 	elsif(p_transaccion='OIP_HOPILO_MOD')then
 
 		begin
-        
+
 			--Sentencia de la modificacion
 			update oip.thoras_piloto set
 			ci = v_parametros.ci,
@@ -157,20 +157,20 @@ BEGIN
 			id_usuario_ai = v_parametros._id_usuario_ai,
 			usuario_ai = v_parametros._nombre_usuario_ai
 			where id_horas_piloto=v_parametros.id_horas_piloto;
-               
+
 			--Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Detalle Calculo sueldo piloto modificado(a)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Detalle Calculo sueldo piloto modificado(a)');
             v_resp = pxp.f_agrega_clave(v_resp,'id_horas_piloto',v_parametros.id_horas_piloto::varchar);
-               
+
             --Devuelve la respuesta
             return v_resp;
-            
+
 		end;
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'OIP_HOPILO_ELI'
  	#DESCRIPCION:	Eliminacion de registros
- 	#AUTOR:		breydi.vasquez	
+ 	#AUTOR:		breydi.vasquez
  	#FECHA:		20-09-2019 13:43:39
 	***********************************/
 
@@ -180,21 +180,21 @@ BEGIN
 			--Sentencia de la eliminacion
 			delete from oip.thoras_piloto
             where id_horas_piloto=v_parametros.id_horas_piloto;
-               
+
             --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Detalle Calculo sueldo piloto eliminado(a)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Detalle Calculo sueldo piloto eliminado(a)');
             v_resp = pxp.f_agrega_clave(v_resp,'id_horas_piloto',v_parametros.id_horas_piloto::varchar);
-              
+
             --Devuelve la respuesta
             return v_resp;
 
 		end;
-        
-	/*********************************    
+
+	/*********************************
  	#TRANSACCION:  'OIP_UPHOPILO_MOD'
  	#DESCRIPCION:	Actualizacion de registros Con el archivo excel
- 	#AUTOR:		breydi.vasquez	
- 	#FECHA:		20-09-2019 
+ 	#AUTOR:		breydi.vasquez
+ 	#FECHA:		20-09-2019
 	***********************************/
 
 	elsif(p_transaccion='OIP_UPHOPILO_MOD')then
@@ -209,16 +209,16 @@ BEGIN
                    vf.desc_funcionario2 as nombre_piloto,
                    vf.ci,
                    vf.id_cargo
-                into 
-                   v_fun                   
+                into
+                   v_fun
             from orga.vfuncionario_cargo_lugar vf
             left join orga.tcargo car on car.id_cargo = vf.id_cargo
             left join orga.tescala_salarial esc on esc.id_escala_salarial = car.id_escala_salarial
             left join orga.tcategoria_salarial cat on cat.id_categoria_salarial = esc.id_categoria_salarial
             left join oip.tanexo1 anex on anex.id_escala_salarial = esc.id_escala_salarial
-            where vf.ci = v_parametros.ci
+            where vf.ci = v_parametros.ci and anex.fecha_fin is null
                 and cat.codigo = 'SUPER';
-            
+
             -- captura de ids gestion, periodo
             select ges.id_gestion,
                    per.id_periodo
@@ -227,15 +227,15 @@ BEGIN
             from param.tgestion ges
             inner join param.tperiodo per on per.id_gestion = ges.id_gestion
             where ges.gestion = v_parametros.gestion
-            and per.periodo = v_parametros.periodo;                  
-            
-            if v_fun.id_funcionario is not null then 
-            
-                -- control si no existe el funcionario dentro el periodo de pago 
-                if  v_fun.id_funcionario not in (select id_funcionario from oip.thoras_piloto 
-                                             where ci = v_parametros.ci 
-                                             and id_archivo_horas_piloto = v_parametros.id_archivo_horas_piloto) then  
-                         
+            and per.periodo = v_parametros.periodo;
+
+            if v_fun.id_funcionario is not null then
+
+                -- control si no existe el funcionario dentro el periodo de pago
+                if  v_fun.id_funcionario not in (select id_funcionario from oip.thoras_piloto
+                                             where ci = v_parametros.ci
+                                             and id_archivo_horas_piloto = v_parametros.id_archivo_horas_piloto) then
+
                           --Sentencia de la insercion
                           insert into oip.thoras_piloto(
                           estado_reg,
@@ -251,7 +251,7 @@ BEGIN
                           estado,
                           horas_simulador_fix,
                           horas_simulador_full,
-                          horas_vuelo,                          
+                          horas_vuelo,
                           id_usuario_reg,
                           fecha_reg,
                           id_usuario_ai,
@@ -272,19 +272,19 @@ BEGIN
                           'activo',
                           v_parametros.horas_simulador_fix,
                           v_parametros.horas_simulador_full,
-                          0,                          
+                          0,
                           p_id_usuario,
                           now(),
                           v_parametros._id_usuario_ai,
                           v_parametros._nombre_usuario_ai,
                           null,
-                          null													
+                          null
                           );
-                          
+
                 else
-                
+
                         --Sentencia de la modificacion
-                        update oip.thoras_piloto set                                                                                                
+                        update oip.thoras_piloto set
                         horas_simulador_full = v_parametros.horas_simulador_full,
                         horas_simulador_fix = v_parametros.horas_simulador_fix,
                         id_usuario_mod = p_id_usuario,
@@ -293,52 +293,52 @@ BEGIN
                         usuario_ai = v_parametros._nombre_usuario_ai
                         where ci = v_parametros.ci and id_archivo_horas_piloto = v_parametros.id_archivo_horas_piloto;
 
-                end if; 
-            
+                end if;
+
        	end if;
-                     
+
 			--Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Detalle Calculo sueldo piloto archivo cargado(a)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Detalle Calculo sueldo piloto archivo cargado(a)');
             v_resp = pxp.f_agrega_clave(v_resp,'modificado nombre_piloto',v_parametros.nombre_piloto::varchar);
-               
+
             --Devuelve la respuesta
             return v_resp;
-            
-		end;        
-         
-	/*********************************    
+
+		end;
+
+	/*********************************
  	#TRANSACCION:  'OIP_CALPAGVAR_IME'
  	#DESCRIPCION:	Medicion y Calculo del pago Variable
- 	#AUTOR:		breydi.vasquez	
+ 	#AUTOR:		breydi.vasquez
  	#FECHA:		20-09-2019
 	***********************************/
 
 	elsif(p_transaccion='OIP_CALPAGVAR_IME')then
 
 		begin
-            
-		
+
+
 		--simulador Full costo hora
-		select costo_hora, maximo_horas 
-        	into 
+		select costo_hora, maximo_horas
+        	into
             v_costo_sim_full, v_max_horas_tipo_simu
         from oip.ttipo_simulador
         where tipo_simulador = 'Full Flight Simulator';
-        
+
         --simulador Fix costo hora
         select costo_hora into v_costo_sim_fix
         from oip.ttipo_simulador
         where tipo_simulador = 'Fix Based Simulator';
-        
+
 
         for v_rec in select
-        				   horpi.id_horas_piloto,	
+        				   horpi.id_horas_piloto,
                            horpi.horas_vuelo,
-                           horpi.nombre_piloto, 
+                           horpi.nombre_piloto,
                            horpi.tipo_flota,
                            horpi.horas_simulador_full as ful,
                            horpi.horas_simulador_fix as fix,
-                           case when horpi.pic_sic = 'PIC' then 
+                           case when horpi.pic_sic = 'PIC' then
                                tflo.costo_hora_base_pic
                            else
                                tflo.costo_hora_base_sic
@@ -350,13 +350,13 @@ BEGIN
                            tflo.maximo_horas,
                            horpi.id_funcionario,
                            horpi.pic_sic,
-                           horpi.id_cargo            
+                           horpi.id_cargo
                         from oip.thoras_piloto horpi
                         inner join oip.ttipo_flota tflo on tflo.tipo_flota = horpi.tipo_flota
                         where horpi.id_archivo_horas_piloto = v_parametros.id_archivo_horas_piloto
                         and horpi.horas_vuelo > 40
         loop
-        	
+
 			---validaciones inicio----------
             select esc.haber_basico,
                    anex.remuneracion_basica,
@@ -366,83 +366,83 @@ BEGIN
                    car.codigo as nro_item,
                    vf.desc_funcionario2,
                    esc.nombre
-            	into 
-                   v_rec_esc                   
+            	into
+                   v_rec_esc
             from orga.vfuncionario_cargo_lugar vf
             left join orga.tcargo car on car.id_cargo = vf.id_cargo
             left join orga.tescala_salarial esc on esc.id_escala_salarial = car.id_escala_salarial
             left join orga.tcategoria_salarial cat on cat.id_categoria_salarial = esc.id_categoria_salarial
             left join oip.tanexo1 anex on anex.id_escala_salarial = esc.id_escala_salarial
-            where vf.id_funcionario = v_rec.id_funcionario	            
+            where vf.id_funcionario = v_rec.id_funcionario	and anex.fecha_fin is null
                 and cat.codigo = 'SUPER';
 
 
-            IF (v_rec_esc.haber_basico is null or v_rec_esc.remuneracion_basica is null ) then 
+            IF (v_rec_esc.haber_basico is null or v_rec_esc.remuneracion_basica is null ) then
             	raise exception 'El funcionario % no cuenta con un haber basico ',coalesce(v_rec_esc.desc_funcionario2,v_rec.nombre_piloto);
             end if;
-            
+
             if v_rec_esc.pic_sic <> v_rec.pic_sic then
             	raise exception 'Existe diferencia de cargo para el funcionario %, la informacion cargada del sistema sicno, es de tipo %,
                  y dentro la escala salarial es %',coalesce(v_rec_esc.desc_funcionario2,v_rec.nombre_piloto),
-                 v_rec.pic_sic, v_rec_esc.pic_sic;            	
+                 v_rec.pic_sic, v_rec_esc.pic_sic;
             end if;
-            
-            if v_rec_esc.tipo_flota <> v_rec.tipo_flota then 
+
+            if v_rec_esc.tipo_flota <> v_rec.tipo_flota then
             	raise exception 'Existe diferencia de tipo flota para el funcionario %',coalesce(v_rec_esc.desc_funcionario2,v_rec.nombre_piloto);
             end if;
-            
-            -- control haber basico diferencias 
+
+            -- control haber basico diferencias
             if v_rec_esc.haber_basico <> v_rec_esc.remuneracion_basica then
-	            raise exception 'Existe diferencia haber basico: escala salarial: %  y anexo1: % 
+	            raise exception 'Existe diferencia haber basico: escala salarial: %  y anexo1: %
                 , para el funcionario: %',v_rec_esc.haber_basico, v_rec_esc.remuneracion_basica, coalesce(v_rec_esc.desc_funcionario2,v_rec.nombre_piloto);
             end if;
-                    	        
-          -- exclucion a funcionarioa operativos 
-          if (v_rec.id_cargo not in (17426,17401,18249,17827,17466) ) then         
+
+          -- exclucion a funcionarioa operativos
+          if (v_rec.id_cargo not in (17426,17401,18249,17827,17466) ) then
 
             ---validaciones fin-------
             ---inicio de calculos-----
         	-- Horas Vuelo
-                                       
-            if v_rec.horas_vuelo <= v_rec.horas_base then 
+
+            if v_rec.horas_vuelo <= v_rec.horas_base then
             	v_horas_adicionales = 0;
-            else 
-                if ( v_rec.horas_vuelo  >= v_rec.maximo_horas ) then 
+            else
+                if ( v_rec.horas_vuelo  >= v_rec.maximo_horas ) then
                         v_horas_adicionales = 40;
-                else 
+                else
                         v_horas_adicionales = v_rec.horas_vuelo - v_rec.horas_base;
                 end if;
-            end if;                    
-                            
+            end if;
+
             --- Calculo Factor Esfuerzo
-            v_factor_esfuerzo = (( v_rec.horas_base + v_horas_adicionales ) / ( v_rec.horas_base + 1 )) * ( 1 / v_rec.relacion_ciclo_hora );                        
-                    
-                    
-            -- Horas Simulador  
+            v_factor_esfuerzo = (( v_rec.horas_base + v_horas_adicionales ) / ( v_rec.horas_base + 1 )) * ( 1 / v_rec.relacion_ciclo_hora );
+
+
+            -- Horas Simulador
             v_horas_simulador = oip.f_horas_simulador(v_rec.ful, v_rec.fix, v_max_horas_tipo_simu, v_horas_adicionales);
 
 
             -- Calculo Pago Variable
-            V_A = v_rec.costo_horas_base * v_factor_esfuerzo * v_horas_adicionales; 
-            
-            -- Calculo costo horas simulador full        
+            V_A = v_rec.costo_horas_base * v_factor_esfuerzo * v_horas_adicionales;
+
+            -- Calculo costo horas simulador full
             V_B = v_costo_sim_full * v_horas_simulador.p_resp_full;
-            
+
             -- Calculo costo horas simulador fix
             V_C = v_costo_sim_fix * v_horas_simulador.p_resp_fix;
-            
-            -- Formula Pago Variable        
+
+            -- Formula Pago Variable
             v_pago_variable = ( v_A + ( coalesce( round(V_B), 0 ) +  coalesce( round(V_C), 0 ) ));
-                    
-            --recupera pago variable de tabla, antes de modificacion de reglamento para corto_alcance CRJ    
-                
+
+            --recupera pago variable de tabla, antes de modificacion de reglamento para corto_alcance CRJ
+
             if v_rec.tipo_flota = 'corto_alcance' and v_rec.horas_base = 40  and v_rec.pic_sic = 'PIC' then
-            
+
                 v_pago_variable = 0.00;
-                
-                --caso horas vuelo sea mayor a 70 maximo establecido por reglamento 
+
+                --caso horas vuelo sea mayor a 70 maximo establecido por reglamento
                 --modificado breyi vasquez (03/12/2019)
-                if v_rec.horas_vuelo > 70 then 
+                if v_rec.horas_vuelo > 70 then
                     select pi.acumulado
                         into v_pago_variable
                     from oip.tacumulado_piloto_corto_alcance pi
@@ -460,31 +460,31 @@ BEGIN
                 V_A = v_pago_variable;
 
             elsif v_rec.tipo_flota = 'corto_alcance' and v_rec.horas_base = 40  and v_rec.pic_sic = 'SIC' then
-                
+
                 v_pago_variable = 0.00;
-                
-                --caso horas vuelo sea mayor a 70 maximo establecido por reglamento 
+
+                --caso horas vuelo sea mayor a 70 maximo establecido por reglamento
                 --modificado breyi vasquez (03/12/2019)
-                if v_rec.horas_vuelo > 70 then 
+                if v_rec.horas_vuelo > 70 then
                     select pi.acumulado
                         into v_pago_variable
                     from oip.tacumulado_copiloto_corto_alcance pi
-                    where pi.horas_vuelo = 70; 
-                else 
+                    where pi.horas_vuelo = 70;
+                else
                     select pi.acumulado
                         into v_pago_variable
                     from oip.tacumulado_copiloto_corto_alcance pi
-                    where pi.horas_vuelo = v_rec.horas_vuelo;                 
+                    where pi.horas_vuelo = v_rec.horas_vuelo;
                 end if;
 
                 V_A = 0.00;
-                V_A = v_pago_variable;                             
-                
-            end if; 
-            
-            if ( (v_rec_esc.haber_basico + round(v_pago_variable)) between v_rec_esc.remuneracion_basica and v_rec_esc.remuneracion_maxima ) then 
+                V_A = v_pago_variable;
+
+            end if;
+
+            if ( (v_rec_esc.haber_basico + round(v_pago_variable)) between v_rec_esc.remuneracion_basica and v_rec_esc.remuneracion_maxima ) then
                 ------- Actualizacion de datos
-                update oip.thoras_piloto set 
+                update oip.thoras_piloto set
                 factor_esfuerzo = v_factor_esfuerzo,
                 pago_variable   = v_pago_variable,
                 monto_horas_vuelo = V_A,
@@ -492,36 +492,36 @@ BEGIN
                 monto_horas_simulador_fix = coalesce(round(V_C), 0),
                 horas_simulador_full_efectivas = coalesce(v_horas_simulador.p_resp_full, 0),
                 horas_simulador_fix_efectivas = coalesce(v_horas_simulador.p_resp_fix, 0)
-                where id_horas_piloto = v_rec.id_horas_piloto; 
-			else 
-                raise exception 'La maxima remuneracion para el funcionario % es de: %, y su haber basico es de % 
+                where id_horas_piloto = v_rec.id_horas_piloto;
+			else
+                raise exception 'La maxima remuneracion para el funcionario % es de: %, y su haber basico es de %
                 mas su pago variable de %, hacen un total de %
-                superando la remuneracion maxima', v_rec.nombre_piloto ,v_rec_esc.remuneracion_maxima, v_rec_esc.haber_basico,  
-                round(v_pago_variable), (v_rec_esc.haber_basico + round(v_pago_variable)); 
-			end if;       
-          end if;                                                    
- 
-                       
-        end loop; 
-            
-        	--suma total pago variable 
+                superando la remuneracion maxima', v_rec.nombre_piloto ,v_rec_esc.remuneracion_maxima, v_rec_esc.haber_basico,
+                round(v_pago_variable), (v_rec_esc.haber_basico + round(v_pago_variable));
+			end if;
+          end if;
+
+
+        end loop;
+
+        	--suma total pago variable
         	select sum(pago_variable) into v_pago_total
-            from oip.thoras_piloto 
+            from oip.thoras_piloto
             where id_archivo_horas_piloto = v_parametros.id_archivo_horas_piloto;
-            
-        	--cambio de estado  y actualizacion de pago total 
+
+        	--cambio de estado  y actualizacion de pago total
         	update oip.tarchivo_horas_piloto set
             estado = 'calculado',
             pago_total = v_pago_total
             where id_archivo_horas_piloto = v_parametros.id_archivo_horas_piloto;
-            
+
 			--registro en la table log
-              
+
               insert into oip.tlog_estado
               (
                 estado_reg,
 				id_archivo_horas_piloto,
-                accion,                
+                accion,
                 detalle,
                 estado,
                 id_usuario_reg,
@@ -538,30 +538,30 @@ BEGIN
                 now(),
                 v_parametros._id_usuario_ai,
                 v_parametros._nombre_usuario_ai
-	            );            
-           
+	            );
+
             --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Calculo sueldo piloto registrados(a)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Calculo sueldo piloto registrados(a)');
             v_resp = pxp.f_agrega_clave(v_resp,'id_archivo_horas_piloto',v_parametros.id_archivo_horas_piloto::varchar);
-              
+
             --Devuelve la respuesta
             return v_resp;
 
 		end;
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'OIP_UPSIMPILO_MOD'
  	#DESCRIPCION:	servicio para insercion o acualizacion de registros
- 	#AUTOR:		breydi.vasquez	
+ 	#AUTOR:		breydi.vasquez
  	#FECHA:		24-09-2019
-	***********************************/        
+	***********************************/
      elsif(p_transaccion = 'OIP_UPSIMPILO_MOD') then
-        
-        begin                     			                              
+
+        begin
 
 			v_gestion = v_parametros.horas_simulador::JSON->>'gestion';
             v_periodo = v_parametros.horas_simulador::JSON->>'periodo';
-            
+
             -- captura de ids gestion, periodo
             select ges.id_gestion,
                    per.id_periodo
@@ -571,23 +571,23 @@ BEGIN
             inner join param.tperiodo per on per.id_gestion = ges.id_gestion
             where ges.gestion = v_gestion
             and per.periodo = v_periodo;
-            
+
             select arhopi.id_periodo, arhopi.id_archivo_horas_piloto
             	into v_gestion_pago
             from oip.tarchivo_horas_piloto arhopi
             where arhopi.id_gestion = v_gestion
             and arhopi.id_periodo = v_periodo;
 
-            
+
 		    v_json = v_parametros.horas_simulador:: JSON->>'piloto';
-             
-          
-			if v_gestion_pago.id_periodo is not null then 
-            		
+
+
+			if v_gestion_pago.id_periodo is not null then
+
 	            for v_registros_json in SELECT json_array_elements(v_json :: JSON) loop
 
              		v_values = v_registros_json.json_array_elements::json;
-                    
+
                     --- captura del funcionario a actualizar
                         select
                                 anex.pic_sic,
@@ -596,33 +596,33 @@ BEGIN
                                 vf.desc_funcionario2 as nombre_piloto,
                                 vf.ci,
                                 vf.id_cargo
-                            into 
-                                v_fun                   
+                            into
+                                v_fun
                         from orga.vfuncionario_cargo_lugar vf
                         left join orga.tcargo car on car.id_cargo = vf.id_cargo
                         left join orga.tescala_salarial esc on esc.id_escala_salarial = car.id_escala_salarial
                         left join orga.tcategoria_salarial cat on cat.id_categoria_salarial = esc.id_categoria_salarial
                         left join oip.tanexo1 anex on anex.id_escala_salarial = esc.id_escala_salarial
-                        where vf.id_funcionario = v_values::json->>'id_funcionario'           
+                        where vf.id_funcionario = v_values::json->>'id_funcionario'  and anex.fecha_fin is null
                             and cat.codigo = 'SUPER';
                     
-                    if v_fun.id_funcionario is not null then 
-                    
-                      ---controlar funcionario existe                
+                    if v_fun.id_funcionario is not null then
+
+                      ---controlar funcionario existe
                         if exists(select 1 from oip.thoras_piloto where id_archivo_horas_piloto = v_gestion_pago.id_archivo_horas_piloto
-                      			and id_funcionario = v_fun.id_funcionario )then 
-                                
+                      			and id_funcionario = v_fun.id_funcionario )then
+
                             --Sentencia de la modificacion
                             update oip.thoras_piloto set
                             horas_simulador_full = v_values::json->>'horas_simulador_full',
                             horas_simulador_fix  =  v_values::json->>'horas_simulador_fix',
                             id_usuario_mod = p_id_usuario,
                             fecha_mod = now()
-                            where ci = v_values::json->>'ci' 
+                            where ci = v_values::json->>'ci'
                                 and id_funcionario = v_values::json->>'id_funcionario'
                                 and id_archivo_horas_piloto = v_gestion_pago.id_archivo_horas_piloto;
                         else
-                      
+
                             --Sentencia de la insercion
                             insert into oip.thoras_piloto(
                             estado_reg,
@@ -661,20 +661,20 @@ BEGIN
                             v_parametros._id_usuario_ai,
                             v_parametros._nombre_usuario_ai,
                             null,
-                            null													
-                            ); 
+                            null
+                            );
                       	end if;
-                    end if;                              
+                    end if;
             	end loop;
-                  
+
                   update oip.tarchivo_horas_piloto set
                   estado = 'archivo_cargado'
-                  where id_archivo_horas_piloto = v_gestion_pago.id_archivo_horas_piloto; 
-                  v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Actualizacion de datos con exito.');                                           
-                  
+                  where id_archivo_horas_piloto = v_gestion_pago.id_archivo_horas_piloto;
+                  v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Actualizacion de datos con exito.');
+
                 else
-                
-                  --Sentencia de la insercion cabecera 
+
+                  --Sentencia de la insercion cabecera
                   insert into oip.tarchivo_horas_piloto(
                   estado_reg,
                   id_gestion,
@@ -698,20 +698,20 @@ BEGIN
                   null,
                   null,
                   null,
-                  null			
+                  null
                   )RETURNING id_archivo_horas_piloto into v_id_archivo_horas_piloto;
-                              
-                  
-                  -- insercion de datos  al detalle                   
+
+
+                  -- insercion de datos  al detalle
 	            for v_registros_json in SELECT json_array_elements(v_json :: JSON) loop
 
-             		v_values = v_registros_json.json_array_elements::json;                  
-                          v_values 		 	= v_registros_json.json_array_elements::json;                                                  
+             		v_values = v_registros_json.json_array_elements::json;
+                          v_values 		 	= v_registros_json.json_array_elements::json;
                           v_id_funcionario	= v_values::json->>'id_funcionario';
                           v_horas_simu_full = v_values::json->>'horas_simulador_full';
-                          v_horas_simu_fix  = v_values::json->>'horas_simulador_fix';                                              
+                          v_horas_simu_fix  = v_values::json->>'horas_simulador_fix';
 
-                          -- datos funcionario 
+                          -- datos funcionario
                           select
                                  anex.pic_sic,
                                  anex.tipo_flota,
@@ -719,19 +719,19 @@ BEGIN
                                  vf.desc_funcionario2 as nombre_piloto,
                                  vf.ci,
                                  vf.id_cargo
-                              into 
-                                 v_fun                   
+                              into
+                                 v_fun
                           from orga.vfuncionario_cargo_lugar vf
                           left join orga.tcargo car on car.id_cargo = vf.id_cargo
                           left join orga.tescala_salarial esc on esc.id_escala_salarial = car.id_escala_salarial
                           left join orga.tcategoria_salarial cat on cat.id_categoria_salarial = esc.id_categoria_salarial
                           left join oip.tanexo1 anex on anex.id_escala_salarial = esc.id_escala_salarial
-                          where vf.id_funcionario = v_id_funcionario
+                          where vf.id_funcionario = v_id_funcionario and anex.fecha_fin is null
                               and cat.codigo = 'SUPER';
-                                              
 
-      					if v_fun.id_funcionario is not null then 
-                                
+
+      					if v_fun.id_funcionario is not null then
+
                             --Sentencia de la insercion
                             insert into oip.thoras_piloto(
                             estado_reg,
@@ -774,40 +774,40 @@ BEGIN
                             v_parametros._id_usuario_ai,
                             v_parametros._nombre_usuario_ai,
                             null,
-                            null													
+                            null
                             );
                         end if;
                     end loop;
-                    
+
                   update oip.tarchivo_horas_piloto set
                   estado = 'registrado'
-                  where id_archivo_horas_piloto = v_id_archivo_horas_piloto; 
+                  where id_archivo_horas_piloto = v_id_archivo_horas_piloto;
                 --Definicion de la respuesta
-                v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Insercion de cabecera y detalle pago variable con exito.');                                                   
+                v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Insercion de cabecera y detalle pago variable con exito.');
              end if;
-             
 
-                  
+
+
             --Devuelve la respuesta
             return v_resp;
-                    
-		end; 
-                        
+
+		end;
+
 	else
-     
+
     	raise exception 'Transaccion inexistente: %',p_transaccion;
 
 	end if;
 
 EXCEPTION
-				
+
 	WHEN OTHERS THEN
 		v_resp='';
 		v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
 		v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
 		v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
 		raise exception '%',v_resp;
-				        
+
 END;
 $body$
 LANGUAGE 'plpgsql'

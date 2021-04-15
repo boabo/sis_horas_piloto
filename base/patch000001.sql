@@ -194,13 +194,13 @@ ALTER TABLE oip.thoras_piloto
   ALTER COLUMN pago_variable TYPE NUMERIC(20,10);
 
 ALTER TABLE oip.thoras_piloto
-  ALTER COLUMN monto_horas_vuelo TYPE NUMERIC(20,10); 
-  
+  ALTER COLUMN monto_horas_vuelo TYPE NUMERIC(20,10);
+
 ALTER TABLE oip.thoras_piloto
   ALTER COLUMN monto_horas_simulador_full TYPE NUMERIC(20,10);
 
 ALTER TABLE oip.thoras_piloto
-  ALTER COLUMN monto_horas_simulador_fix TYPE NUMERIC(20,10);  
+  ALTER COLUMN monto_horas_simulador_fix TYPE NUMERIC(20,10);
 /***********************************F-SCP-BVP-HORAS-PILOTO-0-21/10/2019****************************************/
 
 /***********************************I-SCP-BVP-HORAS-PILOTO-0-01/11/2019****************************************/
@@ -231,3 +231,11 @@ ALTER TABLE oip.tacumulado_piloto_corto_alcance
   OWNER TO postgres;
 
 /***********************************F-SCP-BVP-HORAS-PILOTO-0-01/11/2019****************************************/
+/***********************************I-SCP-BVP-HORAS-PILOTO-0-15/04/2021****************************************/
+
+ALTER TABLE oip.tanexo1
+  ADD COLUMN fecha_ini DATE;
+
+ALTER TABLE oip.tanexo1
+  ADD COLUMN fecha_fin DATE;
+/***********************************F-SCP-BVP-HORAS-PILOTO-0-15/04/2021****************************************/

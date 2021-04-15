@@ -12,11 +12,11 @@ $body$
  DESCRIPCION:   Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'oip.tarchivo_horas_piloto'
  AUTOR: 		 (breydi.vasquez)
  FECHA:	        20-09-2019 13:42:10
- COMENTARIOS:	
+ COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 #ISSUE				FECHA				AUTOR				DESCRIPCION
- #0				20-09-2019 13:42:10								Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'oip.tarchivo_horas_piloto'	
+ #0				20-09-2019 13:42:10								Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'oip.tarchivo_horas_piloto'
  #
  ***************************************************************************/
 
@@ -25,7 +25,7 @@ DECLARE
 	v_nro_requerimiento    			integer;
 	v_parametros           			record;
 	v_id_requerimiento     			integer;
-	v_resp		            		varchar;    
+	v_resp		            		varchar;
 	v_nombre_funcion        		text;
 	v_mensaje_error         		text;
 	v_id_archivo_horas_piloto		integer;
@@ -33,7 +33,7 @@ DECLARE
     v_id_gestion					integer;
     v_id_periodo					integer;
     v_id_horas_piloto				integer;
-    v_registros_json				record;    
+    v_registros_json				record;
     v_json							varchar;
     v_id_funcionario				integer;
     v_tipo_flota					varchar;
@@ -44,27 +44,27 @@ DECLARE
     v_gestion						integer;
     v_periodo						integer;
     v_count							integer;
-	v_gestion_pago					record;		    
+	v_gestion_pago					record;
 	v_rec_esc    	    			record;
-	v_real_tipo_flota    		    varchar;  
-    v_real_pic_sic					varchar; 
-    v_estado						varchar;         
+	v_real_tipo_flota    		    varchar;
+    v_real_pic_sic					varchar;
+    v_estado						varchar;
 BEGIN
 
     v_nombre_funcion = 'oip.ft_archivo_horas_piloto_ime';
     v_parametros = pxp.f_get_record(p_tabla);
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'OIP_ARHOPI_INS'
  	#DESCRIPCION:	Insercion de registros
- 	#AUTOR:		breydi.vasquez	
+ 	#AUTOR:		breydi.vasquez
  	#FECHA:		20-09-2019 13:42:10
 	***********************************/
 
 	if(p_transaccion='OIP_ARHOPI_INS')then
-					
+
         begin
-                
+
         	--Sentencia de la insercion
         	insert into oip.tarchivo_horas_piloto(
 			estado_reg,
@@ -89,11 +89,11 @@ BEGIN
 			v_parametros._id_usuario_ai,
 			v_parametros._nombre_usuario_ai,
 			null,
-			null			
+			null
 			)RETURNING id_archivo_horas_piloto into v_id_archivo_horas_piloto;
-			
+
 			--Definicion de la respuesta
-			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Registro planilla excel almacenado(a) con exito (id_archivo_horas_piloto'||v_id_archivo_horas_piloto||')'); 
+			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Registro planilla excel almacenado(a) con exito (id_archivo_horas_piloto'||v_id_archivo_horas_piloto||')');
             v_resp = pxp.f_agrega_clave(v_resp,'id_archivo_horas_piloto',v_id_archivo_horas_piloto::varchar);
 
             --Devuelve la respuesta
@@ -101,10 +101,10 @@ BEGIN
 
 		end;
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'OIP_ARHOPI_MOD'
  	#DESCRIPCION:	Modificacion de registros
- 	#AUTOR:		breydi.vasquez	
+ 	#AUTOR:		breydi.vasquez
  	#FECHA:		20-09-2019 13:42:10
 	***********************************/
 
@@ -121,30 +121,30 @@ BEGIN
 			id_usuario_ai = v_parametros._id_usuario_ai,
 			usuario_ai = v_parametros._nombre_usuario_ai
 			where id_archivo_horas_piloto=v_parametros.id_archivo_horas_piloto;
-               
+
 			--Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Registro planilla excel modificado(a)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Registro planilla excel modificado(a)');
             v_resp = pxp.f_agrega_clave(v_resp,'id_archivo_horas_piloto',v_parametros.id_archivo_horas_piloto::varchar);
-               
+
             --Devuelve la respuesta
             return v_resp;
-            
+
 		end;
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'OIP_ARHOPI_ELI'
  	#DESCRIPCION:	Eliminacion de registros del excel cargado
- 	#AUTOR:		breydi.vasquez	
+ 	#AUTOR:		breydi.vasquez
  	#FECHA:		20-09-2019 13:42:10
 	***********************************/
 
 	elsif(p_transaccion='OIP_ARHOPI_ELI')then
 
 		begin
-			--Sentencia de la eliminacion 
+			--Sentencia de la eliminacion
 
         	if pxp.f_existe_parametro(p_tabla, 'eliminarExcelPilotos') then
-             
+
              --Sentencia de la modificacion
               update oip.thoras_piloto set
               horas_simulador_full = null,
@@ -154,18 +154,18 @@ BEGIN
               id_usuario_ai = v_parametros._id_usuario_ai,
               usuario_ai = v_parametros._nombre_usuario_ai
               where id_archivo_horas_piloto = v_parametros.id_archivo_horas_piloto;
-              
+
               update oip.tarchivo_horas_piloto set
               estado = 'registrado',
               archivo = null
               where id_archivo_horas_piloto = v_parametros.id_archivo_horas_piloto;
-              
-              ---insertar en el log 
+
+              ---insertar en el log
               insert into oip.tlog_estado
               (
                 estado_reg,
 				id_archivo_horas_piloto,
-                accion,                
+                accion,
                 detalle,
                 estado,
                 id_usuario_reg,
@@ -183,13 +183,13 @@ BEGIN
                 v_parametros._id_usuario_ai,
                 v_parametros._nombre_usuario_ai
 	            );
-            
+
               --Definicion de la respuesta
-              v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se elimino correctamente los registros cargados');                             
-              
-            --- borrar datos de calculo  
+              v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se elimino correctamente los registros cargados');
+
+            --- borrar datos de calculo
         	ELSIF pxp.f_existe_parametro(p_tabla,'datosCalculados')then
-            
+
              --Sentencia de la modificacion
               update oip.thoras_piloto set
               pago_variable = null,
@@ -213,13 +213,13 @@ BEGIN
               estado = v_estado,
               pago_total = null
               where id_archivo_horas_piloto = v_parametros.id_archivo_horas_piloto;
-              
-              ---insertar en el log 
+
+              ---insertar en el log
               insert into oip.tlog_estado
               (
                 estado_reg,
 				id_archivo_horas_piloto,
-                accion,                
+                accion,
                 detalle,
                 estado,
                 id_usuario_reg,
@@ -237,32 +237,32 @@ BEGIN
                 v_parametros._id_usuario_ai,
                 v_parametros._nombre_usuario_ai
 	            );
-            
+
               --Definicion de la respuesta
-              v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se elimino correctamente los Calculos realizados');                             
-                          
-            
-            else       
+              v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se elimino correctamente los Calculos realizados');
+
+
+            else
 
               delete from oip.tarchivo_horas_piloto
               where id_archivo_horas_piloto=v_parametros.id_archivo_horas_piloto;
-              
+
               --Definicion de la respuesta
-              v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Registro planilla excel eliminado(a)');               
-              
-            end if;   
-            
+              v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Registro planilla excel eliminado(a)');
+
+            end if;
+
             v_resp = pxp.f_agrega_clave(v_resp,'id_archivo_horas_piloto',v_parametros.id_archivo_horas_piloto::varchar);
-            
+
             --Devuelve la respuesta
             return v_resp;
 
-		end;  
+		end;
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'OIP_FINPAGVAR_MOD'
  	#DESCRIPCION:	Modificacion de registros
- 	#AUTOR:		breydi.vasquez	
+ 	#AUTOR:		breydi.vasquez
  	#FECHA:		20-09-2019 13:42:10
 	***********************************/
 
@@ -274,13 +274,13 @@ BEGIN
             estado = 'finalizado',
             cerrado = 'si'
 			where id_archivo_horas_piloto=v_parametros.id_archivo_horas_piloto;
-                          
-              
+
+
               insert into oip.tlog_estado
               (
                 estado_reg,
 				id_archivo_horas_piloto,
-                accion,                
+                accion,
                 detalle,
                 estado,
                 id_usuario_reg,
@@ -297,20 +297,20 @@ BEGIN
                 now(),
                 v_parametros._id_usuario_ai,
                 v_parametros._nombre_usuario_ai
-	            );               
+	            );
 			--Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se finalizo el item'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se finalizo el item');
             v_resp = pxp.f_agrega_clave(v_resp,'id_archivo_horas_piloto',v_parametros.id_archivo_horas_piloto::varchar);
-               
+
             --Devuelve la respuesta
             return v_resp;
-            
-		end; 
-        
-	/*********************************    
+
+		end;
+
+	/*********************************
  	#TRANSACCION:  'OIP_UPPATHEXC_MOD'
  	#DESCRIPCION:	Modificacion de registros
- 	#AUTOR:		breydi.vasquez	
+ 	#AUTOR:		breydi.vasquez
  	#FECHA:		20-09-2019 13:42:10
 	***********************************/
 
@@ -322,15 +322,15 @@ BEGIN
 			update oip.tarchivo_horas_piloto set
             estado = 'archivo_cargado',
             archivo = v_parametros.path_excel
-			where id_archivo_horas_piloto=v_parametros.id_archivo_horas_piloto;            
+			where id_archivo_horas_piloto=v_parametros.id_archivo_horas_piloto;
 
-            ---insert log horas pilotos 
-              
+            ---insert log horas pilotos
+
               insert into oip.tlog_estado
               (
                 estado_reg,
 				id_archivo_horas_piloto,
-                accion,                
+                accion,
                 detalle,
                 estado,
                 id_usuario_reg,
@@ -347,31 +347,31 @@ BEGIN
                 now(),
                 v_parametros._id_usuario_ai,
                 v_parametros._nombre_usuario_ai
-	            ); 
-                               
+	            );
+
 			--Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se subio el archivo'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se subio el archivo');
             v_resp = pxp.f_agrega_clave(v_resp,'path_excel',v_parametros.path_excel::varchar);
-               
+
             --Devuelve la respuesta
             return v_resp;
-            
-		end;         
-        
-        
-	/*********************************    
+
+		end;
+
+
+	/*********************************
  	#TRANSACCION:  'OIP_DATAPILO_INS'
  	#DESCRIPCION:	insercion de registros
- 	#AUTOR:		breydi.vasquez	
+ 	#AUTOR:		breydi.vasquez
  	#FECHA:		24-09-2019
-	***********************************/        
+	***********************************/
      elsif(p_transaccion = 'OIP_DATAPILO_INS') then
-        
-        begin         
-            
+
+        begin
+
 			v_gestion = v_parametros.pilotos:: JSON->>'gestion';
-            v_periodo = v_parametros.pilotos:: JSON->>'periodo';            
-            
+            v_periodo = v_parametros.pilotos:: JSON->>'periodo';
+
             select ges.id_gestion,
                    per.id_periodo,
                    param.f_literal_periodo(per.id_periodo) as mes
@@ -384,31 +384,31 @@ BEGIN
 
 			select id_periodo, id_archivo_horas_piloto, estado
             	into  v_gestion_pago
-            from oip.tarchivo_horas_piloto 
-            where id_periodo = v_rec.id_periodo 
-            and id_gestion = v_rec.id_gestion; 
+            from oip.tarchivo_horas_piloto
+            where id_periodo = v_rec.id_periodo
+            and id_gestion = v_rec.id_gestion;
 
-            --verifica periodo existe 
+            --verifica periodo existe
             if  v_gestion_pago.id_periodo is not null then
-            
-             	v_json = v_parametros.pilotos:: JSON->>'pilotos'; -- json con los datos de los pilotos 
 
-      			if v_gestion_pago.estado in ('registrado') then      			
+             	v_json = v_parametros.pilotos:: JSON->>'pilotos'; -- json con los datos de los pilotos
+
+      			if v_gestion_pago.estado in ('registrado') then
                       for v_registros_json in SELECT json_array_elements(v_json :: JSON) loop
 
-                          v_values 		   = v_registros_json.json_array_elements::json;                                                  
+                          v_values 		   = v_registros_json.json_array_elements::json;
                           v_id_funcionario = v_values::json->>'id_funcionario';
                           v_horas_vuelo    = v_values::json->>'horas_vuelo';
                           v_cargo		   = v_values::json->>'cargo';
-                          
-                          
+
+
                           if 	 v_values::json->>'tipo_flota' = 'LARGO' then
                                   v_tipo_flota = 'largo_alcance';
                           elsif  v_values::json->>'tipo_flota' = 'MEDIANO' then
                                   v_tipo_flota = 'mediano_alcance';
                           elsif  v_values::json->>'tipo_flota' = 'CORTO' then
                                   v_tipo_flota = 'corto_alcance';
-                          end if; 
+                          end if;
 
                           ---verficacion de funcionario y captura de datos funcionario ----------
                             select
@@ -418,35 +418,35 @@ BEGIN
                                    vf.desc_funcionario2 as nombre_piloto,
                                    vf.ci,
                                    vf.id_cargo
-                                into 
-                                   v_rec_esc                   
+                                into
+                                   v_rec_esc
                             from orga.vfuncionario_cargo_lugar vf
                             left join orga.tcargo car on car.id_cargo = vf.id_cargo
                             left join orga.tescala_salarial esc on esc.id_escala_salarial = car.id_escala_salarial
                             left join orga.tcategoria_salarial cat on cat.id_categoria_salarial = esc.id_categoria_salarial
                             left join oip.tanexo1 anex on anex.id_escala_salarial = esc.id_escala_salarial
-                            where vf.id_funcionario = v_id_funcionario           
+                            where vf.id_funcionario = v_id_funcionario  and anex.fecha_fin is null
                                 and cat.codigo = 'SUPER';
 
-                      ---control funcionario existe dentro el periodo 
+                      ---control funcionario existe dentro el periodo
                 	  if v_rec_esc.id_funcionario is not null then
                                 -- caso de diferencia actualiza el tipo flota del cargo con item del ERP, si no se mantiene
                                 if v_rec_esc.tipo_flota <> v_tipo_flota then
                                 	v_real_tipo_flota = v_rec_esc.tipo_flota;
-                                else 
+                                else
                                 	v_real_tipo_flota = v_tipo_flota;
-                                end if; 
+                                end if;
 
-                                if v_rec_esc.pic_sic <> v_cargo then 
+                                if v_rec_esc.pic_sic <> v_cargo then
                                 	v_real_pic_sic =  v_rec_esc.pic_sic;
                                 else
-                                	v_real_pic_sic =  v_cargo;                                	
+                                	v_real_pic_sic =  v_cargo;
                                 end if;
 
                             --verificar si existe funcionario en el periodo
                         if exists(select 1 from oip.thoras_piloto where id_archivo_horas_piloto = v_gestion_pago.id_archivo_horas_piloto
                                     and id_funcionario = v_id_funcionario )then
-                        
+
                                 update oip.thoras_piloto set
                                 horas_vuelo = v_horas_vuelo,
                                 pic_sic =  v_cargo,
@@ -454,7 +454,7 @@ BEGIN
                                 where id_archivo_horas_piloto = v_gestion_pago.id_archivo_horas_piloto
                                     and id_funcionario = v_id_funcionario;
                         else
-                      
+
                                 --Sentencia de la insercion
                                 insert into oip.thoras_piloto(
                                 estado_reg,
@@ -493,24 +493,24 @@ BEGIN
                                 v_parametros._id_usuario_ai,
                                 v_parametros._nombre_usuario_ai,
                                 null,
-                                null													
-                                ); 
-                          end if;                     
+                                null
+                                );
+                          end if;
                       end if;
-    			        
+
                    	 end loop;
                 else
-                   	if v_gestion_pago.estado = 'archivo_cargado' then 
+                   	if v_gestion_pago.estado = 'archivo_cargado' then
                         raise exception 'El pago variable para el mes de %, se encuentra cargado con el archivo Excel de horas piloto, no puede relizar nuevamente los registros', v_rec.mes;
-                    elsif v_gestion_pago.estado = 'calculado' then 
-                        raise exception 'El pago variable para el mes de %, se encuentra en proceso de calculo, no puede realizar nuevamente los registros', v_rec.mes;                    
-                    elsif v_gestion_pago.estado = 'finalizado' then 
+                    elsif v_gestion_pago.estado = 'calculado' then
+                        raise exception 'El pago variable para el mes de %, se encuentra en proceso de calculo, no puede realizar nuevamente los registros', v_rec.mes;
+                    elsif v_gestion_pago.estado = 'finalizado' then
                         raise exception 'El pago variable para el mes de %, se encuentra finalizado, no puede realizar nuevamente los registros', v_rec.mes;
-                   end if;  
-                 end if;   
-            -- caso no este registrado                    	            
-            else 
-            
+                   end if;
+                 end if;
+            -- caso no este registrado
+            else
+
                   --Sentencia de la insercion cabecera
                   insert into oip.tarchivo_horas_piloto(
                   estado_reg,
@@ -535,30 +535,30 @@ BEGIN
                   null,
                   null,
                   null,
-                  null			
+                  null
                   )RETURNING id_archivo_horas_piloto, id_gestion, id_periodo into v_id_archivo_horas_piloto, v_id_gestion, v_id_periodo;
-                  
+
 
                   v_json = v_parametros.pilotos:: JSON->>'pilotos';
-                  
+
                   --Sentencia de la insercion detalle
-                  
+
                       for v_registros_json in SELECT json_array_elements(v_json :: JSON) loop
 
-                          v_values 		 = v_registros_json.json_array_elements::json;                                                  
+                          v_values 		 = v_registros_json.json_array_elements::json;
                           v_id_funcionario = v_values::json->>'id_funcionario';
                           v_horas_vuelo    = v_values::json->>'horas_vuelo';
                           v_cargo			 = v_values::json->>'cargo';
-                          
-                          
+
+
                           if 	   v_values::json->>'tipo_flota' = 'LARGO' then
                                   v_tipo_flota = 'largo_alcance';
                           elsif  v_values::json->>'tipo_flota' = 'MEDIANO' then
                                   v_tipo_flota = 'mediano_alcance';
                           elsif  v_values::json->>'tipo_flota' = 'CORTO' then
                                   v_tipo_flota = 'corto_alcance';
-                          end if;                    
-                          
+                          end if;
+
                           ---verficacion de funcionario y captura de datos funcionario ----------
                             select
                                    anex.pic_sic,
@@ -567,30 +567,30 @@ BEGIN
                                    vf.desc_funcionario2 as nombre_piloto,
                                    vf.ci,
                                    vf.id_cargo
-                                into 
-                                   v_rec_esc                   
+                                into
+                                   v_rec_esc
                             from orga.vfuncionario_cargo_lugar vf
                             left join orga.tcargo car on car.id_cargo = vf.id_cargo
                             left join orga.tescala_salarial esc on esc.id_escala_salarial = car.id_escala_salarial
                             left join orga.tcategoria_salarial cat on cat.id_categoria_salarial = esc.id_categoria_salarial
                             left join oip.tanexo1 anex on anex.id_escala_salarial = esc.id_escala_salarial
-                            where vf.id_funcionario = v_id_funcionario          
+                            where vf.id_funcionario = v_id_funcionario and anex.fecha_fin is null
                                 and cat.codigo = 'SUPER';
-                                              
-                          
-      					  if v_rec_esc.id_funcionario is not null then 
+
+
+      					  if v_rec_esc.id_funcionario is not null then
                                 -- caso de diferencia actualiza el tipo flota del cargo con item del ERP, si no se mantiene
                                 if v_rec_esc.tipo_flota <> v_tipo_flota then
                                 	v_real_tipo_flota = v_rec_esc.tipo_flota;
-                                else 
+                                else
                                 	v_real_tipo_flota = v_tipo_flota;
                                 end if;
 
-                                if v_rec_esc.pic_sic <> v_cargo then 
+                                if v_rec_esc.pic_sic <> v_cargo then
                                 	v_real_pic_sic =  v_rec_esc.pic_sic;
                                 else
-                                	v_real_pic_sic =  v_cargo;                                	
-                                end if;                                     
+                                	v_real_pic_sic =  v_cargo;
+                                end if;
 
                             --Sentencia de la insercion
                             insert into oip.thoras_piloto(
@@ -630,41 +630,41 @@ BEGIN
                             v_parametros._id_usuario_ai,
                             v_parametros._nombre_usuario_ai,
                             null,
-                            null													
+                            null
                             );
-							end if;                                                               
-                      end loop;                
-      				
-                      -- update estado registro 
+							end if;
+                      end loop;
+
+                      -- update estado registro
                       update oip.tarchivo_horas_piloto set
                           estado = 'registrado'
-                      where id_archivo_horas_piloto = v_id_archivo_horas_piloto;            
-            end if;			
+                      where id_archivo_horas_piloto = v_id_archivo_horas_piloto;
+            end if;
 			--Definicion de la respuesta
-			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Registro almacenado(a) con exito (id_archivo_horas_piloto'||v_id_archivo_horas_piloto||')'); 
-            v_resp = pxp.f_agrega_clave(v_resp,'id_archivo_horas_piloto',v_id_archivo_horas_piloto::varchar);           
+			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Registro almacenado(a) con exito (id_archivo_horas_piloto'||v_id_archivo_horas_piloto||')');
+            v_resp = pxp.f_agrega_clave(v_resp,'id_archivo_horas_piloto',v_id_archivo_horas_piloto::varchar);
 
             --Devuelve la respuesta
             return v_resp;
-                    
-		end;         
-                    
-         
+
+		end;
+
+
 	else
-     
+
     	raise exception 'Transaccion inexistente: %',p_transaccion;
 
 	end if;
 
 EXCEPTION
-				
+
 	WHEN OTHERS THEN
 		v_resp='';
 		v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
 		v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
 		v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
 		raise exception '%',v_resp;
-				        
+
 END;
 $body$
 LANGUAGE 'plpgsql'

@@ -19,7 +19,19 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.init();
                 this.load({params:{start:0, limit:this.tam_pag}})
             },
-
+            gruposBarraTareas:[
+            		{name: 'vigente', title: '<h1 style="text-align: center; color: #00B167;">VIGENTES</h1>',grupo: 0, height: 0} ,
+            		{name: 'caducado', title: '<h1 style="text-align: center; color: #FF8F85;">CADUCADOS</h1>', grupo: 1, height: 1},
+            		],
+        	  actualizarSegunTab: function(name, indice){
+        				this.store.baseParams.estado_anexo = name;
+        				this.load({params:{start:0, limit:this.tam_pag}});
+        		},
+            bnewGroups: [0],
+            bdelGroups:  [0],
+            bactGroups:  [0,1],
+            bexcelGroups: [0,1],
+            // beditGroups: [0,1],
             Atributos:[
                 {
                     //configuracion del componente
@@ -216,6 +228,38 @@ header("content-type: text/javascript; charset=UTF-8");
                     form:true
                 },
                 {
+            			config:{
+            				name: 'fecha_ini',
+            				fieldLabel: 'Fecha Inicio',
+            				allowBlank: false,
+            				anchor: '40%',
+            				gwidth: 100,
+            							format: 'd/m/Y',
+            							renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+            			},
+            				type:'DateField',
+            				filters:{pfiltro:'tipane1.fecha_ini',type:'date'},
+            				id_grupo:1,
+            				grid:true,
+            				form:true
+            		},
+                {
+            			config:{
+            				name: 'fecha_fin',
+            				fieldLabel: 'Fecha Fin',
+            				allowBlank: true,
+            				anchor: '40%',
+            				gwidth: 100,
+            							format: 'd/m/Y',
+            							renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+            			},
+            				type:'DateField',
+            				filters:{pfiltro:'tipane1.fecha_fin',type:'date'},
+            				id_grupo:1,
+            				grid:true,
+            				form:true
+            		},
+                {
                     config:{
                         name: 'usr_reg',
                         fieldLabel: 'Creado por',
@@ -347,7 +391,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 {name:'usr_reg', type: 'string'},
                 {name:'usr_mod', type: 'string'},
                 {name:'desc_nombre_salarial', type: 'string'},
-
+                {name:'fecha_ini', type: 'date',dateFormat:'Y-m-d'},
+                {name:'fecha_fin', type: 'date',dateFormat:'Y-m-d'},
 
             ],
             sortInfo:{
@@ -356,9 +401,16 @@ header("content-type: text/javascript; charset=UTF-8");
             },
             bdel:true,
             bsave:false,
-            btest:false
+            btest:false,
+            onButtonNew: function() {
+                this.Cmp.fecha_ini.setValue(new Date());
+               	this.ocultarComponente(this.Cmp.fecha_fin);
+               	Phx.vista.Anexo1.superclass.onButtonNew.call(this);
+            },
+           	onButtonEdit:function(){
+              this.mostrarComponente(this.Cmp.fecha_fin);
+              Phx.vista.Anexo1.superclass.onButtonEdit.call(this);
+            }
         }
     )
 </script>
-
-		

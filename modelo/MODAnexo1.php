@@ -37,9 +37,11 @@ class MODAnexo1 extends MODbase{
         $this->captura('usr_reg','varchar');
         $this->captura('usr_mod','varchar');
         $this->captura('desc_nombre_salarial','varchar');
-
+        $this->captura('fecha_ini','date');
+        $this->captura('fecha_fin','date');
         //Ejecuta la instruccion
         $this->armarConsulta();
+        // echo $this->consulta;exit;
         $this->ejecutarConsulta();
 
         //Devuelve la respuesta
@@ -60,7 +62,8 @@ class MODAnexo1 extends MODbase{
         $this->setParametro('remuneracion_maxima','remuneracion_maxima','numeric');
         $this->setParametro('tipo_flota','tipo_flota','varchar');
         $this->setParametro('pic_sic','pic_sic','varchar');
-
+        $this->setParametro('fecha_ini','fecha_ini','date');
+        $this->setParametro('fecha_fin','fecha_fin','date');
         //Ejecuta la instruccion
         $this->armarConsulta();
         $this->ejecutarConsulta();
@@ -84,7 +87,8 @@ class MODAnexo1 extends MODbase{
         $this->setParametro('remuneracion_maxima','remuneracion_maxima','numeric');
         $this->setParametro('tipo_flota','tipo_flota','varchar');
         $this->setParametro('pic_sic','pic_sic','varchar');
-
+        $this->setParametro('fecha_ini','fecha_ini','date');
+        $this->setParametro('fecha_fin','fecha_fin','date');
         //Ejecuta la instruccion
         $this->armarConsulta();
         $this->ejecutarConsulta();

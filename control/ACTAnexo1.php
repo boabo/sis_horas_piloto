@@ -2,7 +2,7 @@
 /**
  *@package pXP
  *@file gen-ACTAnexo1.php
- *@author  (admin)
+ *@author  (breydi.vasquez)
  *@date 26-09-2019 12:54:57
  *@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
  */
@@ -15,6 +15,12 @@ class ACTAnexo1 extends ACTbase
         $this->objParam->defecto('ordenacion', 'id_anexo1');
 
         $this->objParam->defecto('dir_ordenacion', 'asc');
+
+        if ($this->objParam->getParametro('estado_anexo')=='vigente'){
+            $this->objParam->addFiltro(" tipane1.fecha_fin is null ");
+        }else{
+            $this->objParam->addFiltro(" tipane1.fecha_fin is not null ");
+        }
         if ($this->objParam->getParametro('tipoReporte') == 'excel_grid' || $this->objParam->getParametro('tipoReporte') == 'pdf_grid') {
             $this->objReporte = new Reporte($this->objParam, $this);
             $this->res = $this->objReporte->generarReporteListado('MODAnexo1', 'listarAnexo1');
