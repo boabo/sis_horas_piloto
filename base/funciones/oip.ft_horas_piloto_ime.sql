@@ -353,6 +353,9 @@ BEGIN
                            horpi.id_cargo
                         from oip.thoras_piloto horpi
                         inner join oip.ttipo_flota tflo on tflo.tipo_flota = horpi.tipo_flota
+                        inner join orga.tuo_funcionario uf on uf.id_funcionario = horpi.id_funcionario and uf.id_uo_funcionario = orga.f_get_ultima_asignacion(horpi.id_funcionario)
+                        inner join orga.tcargo c on c.id_cargo = uf.id_cargo
+                        inner join orga.ttipo_contrato tc on tc.id_tipo_contrato = c.id_tipo_contrato and tc.codigo = 'PLA'
                         where horpi.id_archivo_horas_piloto = v_parametros.id_archivo_horas_piloto
                         and horpi.horas_vuelo > 40
         loop
@@ -605,7 +608,7 @@ BEGIN
                         left join oip.tanexo1 anex on anex.id_escala_salarial = esc.id_escala_salarial
                         where vf.id_funcionario = v_values::json->>'id_funcionario'  and anex.fecha_fin is null
                             and cat.codigo = 'SUPER';
-                    
+
                     if v_fun.id_funcionario is not null then
 
                       ---controlar funcionario existe

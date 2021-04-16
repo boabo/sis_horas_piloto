@@ -12,11 +12,11 @@ $body$
  DESCRIPCION:   Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'oip.thoras_piloto'
  AUTOR: 		 (breydi.vasquez)
  FECHA:	        20-09-2019 13:43:39
- COMENTARIOS:	
+ COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 #ISSUE				FECHA				AUTOR				DESCRIPCION
- #0				20-09-2019 13:43:39								Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'oip.thoras_piloto'	
+ #0				20-09-2019 13:43:39								Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'oip.thoras_piloto'
  #
  ***************************************************************************/
 
@@ -26,21 +26,21 @@ DECLARE
 	v_parametros  		record;
 	v_nombre_funcion   	text;
 	v_resp				varchar;
-			    
+
 BEGIN
 
 	v_nombre_funcion = 'oip.ft_horas_piloto_sel';
     v_parametros = pxp.f_get_record(p_tabla);
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'OIP_HOPILO_SEL'
  	#DESCRIPCION:	Consulta de datos
- 	#AUTOR:		breydi.vasquez	
+ 	#AUTOR:		breydi.vasquez
  	#FECHA:		20-09-2019 13:43:39
 	***********************************/
 
 	if(p_transaccion='OIP_HOPILO_SEL')then
-     				
+
     	begin
     		--Sentencia de la consulta
 			v_consulta:='select
@@ -72,30 +72,31 @@ BEGIN
 						hopilo.fecha_mod,
 						usu1.cuenta as usr_reg,
 						usu2.cuenta as usr_mod,
-                        hopilo.id_funcionario	
+                        hopilo.id_funcionario
 						from oip.thoras_piloto hopilo
 						inner join segu.tusuario usu1 on usu1.id_usuario = hopilo.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = hopilo.id_usuario_mod
-                        inner join param.tgestion ges on ges.id_gestion = hopilo.gestion 
+                        inner join param.tgestion ges on ges.id_gestion = hopilo.gestion
                         inner join param.tperiodo per on per.id_periodo = hopilo.mes
                         inner join orga.vfuncionario fun on fun.id_funcionario = hopilo.id_funcionario
                         inner join orga.tcargo car on car.id_cargo = hopilo.id_cargo
-                        inner join orga.tescala_salarial esc on esc.id_escala_salarial = car.id_escala_salarial                        
+                        inner join orga.ttipo_contrato tc on tc.id_tipo_contrato = car.id_tipo_contrato
+                        inner join orga.tescala_salarial esc on esc.id_escala_salarial = car.id_escala_salarial
 				        where  ';
-			
+
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 
 			--Devuelve la respuesta
 			return v_consulta;
-						
+
 		end;
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'OIP_HOPILO_CONT'
  	#DESCRIPCION:	Conteo de registros
- 	#AUTOR:		breydi.vasquez	
+ 	#AUTOR:		breydi.vasquez
  	#FECHA:		20-09-2019 13:43:39
 	***********************************/
 
@@ -108,27 +109,30 @@ BEGIN
 					    from oip.thoras_piloto hopilo
 					    inner join segu.tusuario usu1 on usu1.id_usuario = hopilo.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = hopilo.id_usuario_mod
-                        inner join param.tgestion ges on ges.id_gestion = hopilo.gestion 
+                        inner join param.tgestion ges on ges.id_gestion = hopilo.gestion
                         inner join param.tperiodo per on per.id_periodo = hopilo.mes
                         inner join orga.vfuncionario fun on fun.id_funcionario = hopilo.id_funcionario
+                        inner join orga.tcargo car on car.id_cargo = hopilo.id_cargo
+					              inner join orga.ttipo_contrato tc on tc.id_tipo_contrato = car.id_tipo_contrato
+                        inner join orga.tescala_salarial esc on esc.id_escala_salarial = car.id_escala_salarial
 					    where ';
-			
-			--Definicion de la respuesta		    
+
+			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 
 			--Devuelve la respuesta
 			return v_consulta;
 
-		end;        
-					
+		end;
+
 	else
-					     
+
 		raise exception 'Transaccion inexistente';
-					         
+
 	end if;
-					
+
 EXCEPTION
-					
+
 	WHEN OTHERS THEN
 			v_resp='';
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);

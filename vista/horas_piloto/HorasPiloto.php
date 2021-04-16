@@ -13,20 +13,32 @@ header("content-type: text/javascript; charset=UTF-8");
 Phx.vista.HorasPiloto=Ext.extend(Phx.gridInterfaz,{
 
 	constructor:function(config){
-		this.maestro=config.maestro;        
+		this.maestro=config.maestro;
     	//llama al constructor de la clase padre
 		Phx.vista.HorasPiloto.superclass.constructor.call(this,config);
 		this.init();
         this.iniciarEventos();
-        this.addButton('btnPiHorasVuelo', {                
-            text: 'Rep. Pilotos Horas Vuelo',            
+        this.addButton('btnPiHorasVuelo', {
+            text: 'Rep. Pilotos Horas Vuelo',
             iconCls:'bexcel',
             disabled: true,
             handler:this.PilHorasVuelo,
             tooltip: '<b>Finaliza</b><br/>Historial de cambios de estado.'
-        });        		
+        });
 	},
-			
+	gruposBarraTareas:[
+			{name: 'si', title: '<h1 style="text-align: center; color: #00B167;">PLANTA</h1>',grupo: 0, height: 0} ,
+			{name: 'no', title: '<h1 style="text-align: center; color: #FF8F85;">OTROS</h1>', grupo: 1, height: 1},
+			],
+	actualizarSegunTab: function(name, indice){
+			this.store.baseParams.planta = name;
+			this.load({params:{start:0, limit:this.tam_pag}});
+	},
+	bnewGroups: [],
+	bdelGroups:  [],
+	bactGroups:  [0,1],
+	bexcelGroups: [0,1],
+	btnPiHorasVuelo:[0,1],	
 	Atributos:[
 		{
 			//configuracion del componente
@@ -36,14 +48,14 @@ Phx.vista.HorasPiloto=Ext.extend(Phx.gridInterfaz,{
 					name: 'id_horas_piloto'
 			},
 			type:'Field',
-			form:true 
+			form:true
 		},
         {
             config: {
                 name: 'id_funcionario',
                 fieldLabel: 'Nombre Piloto',
                 allowBlank: true,
-                emptyText: 'Elija una opción...',                
+                emptyText: 'Elija una opción...',
                 store: new Ext.data.JsonStore({
                     url: '../../sis_organigrama/control/Funcionario/listarFuncionarioCargo',
                     id: 'id_funcionario',
@@ -88,7 +100,7 @@ Phx.vista.HorasPiloto=Ext.extend(Phx.gridInterfaz,{
             },
             grid: true,
             form: true
-        },        
+        },
 		/*{
 			config:{
 				name: 'nombre_piloto',
@@ -127,7 +139,7 @@ Phx.vista.HorasPiloto=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '40%',
 				gwidth: 100,
-                renderer: (value) => {                    
+                renderer: (value) => {
                     if(value == 'PIC'){
                         return String.format('<div style="color:blue;font-weight:bold;">Piloto</div>');
                     }else if(value == 'SIC'){
@@ -135,7 +147,7 @@ Phx.vista.HorasPiloto=Ext.extend(Phx.gridInterfaz,{
                     }else{
                         return '';
                     }
-                }				
+                }
 			},
 				type:'TextField',
 				filters:{pfiltro:'hopilo.pic_sic',type:'string'},
@@ -150,13 +162,13 @@ Phx.vista.HorasPiloto=Ext.extend(Phx.gridInterfaz,{
 				fieldLabel: 'Cargo',
 				allowBlank: true,
 				anchor: '80%',
-				gwidth: 140,				
+				gwidth: 140,
 			},
-				type:'TextField',                
+				type:'TextField',
 				id_grupo:1,
 				grid:true,
 				form:true
-		},                          
+		},
 		{
 			config:{
 				name: 'tipo_flota',
@@ -189,9 +201,9 @@ Phx.vista.HorasPiloto=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '40%',
 				gwidth: 100,
-                renderer: (value, p, record) => {  
+                renderer: (value, p, record) => {
                     return  String.format('<div style="text-align:center;">{0}</div>', value);
-                }									
+                }
 			},
 				type:'NumberField',
 				filters:{pfiltro:'hopilo.horas_vuelo',type:'numeric'},
@@ -206,13 +218,13 @@ Phx.vista.HorasPiloto=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '40%',
 				gwidth: 150,
-                renderer: (value, p, record) => {  
+                renderer: (value, p, record) => {
                     if (value == null) {
                         return  '';
                     }else{
                         return  String.format('<div style="text-align:center;">{0}</div>', value);
-                    }                    
-                }					
+                    }
+                }
 			},
 				type:'NumberField',
 				filters:{pfiltro:'hopilo.horas_simulador_full',type:'numeric'},
@@ -227,13 +239,13 @@ Phx.vista.HorasPiloto=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '40%',
 				gwidth: 120,
-                renderer: (value,p,record) => {                      
+                renderer: (value,p,record) => {
                         if (value == null){
                             return  '';
                         }else{
                             return  String.format('<div style="text-align:center;">{0}</div>', value);
                         }
-                } 			                				
+                }
 			},
 				type:'NumberField',
 				filters:{pfiltro:'hopilo.horas_simulador_fix',type:'numeric'},
@@ -248,13 +260,13 @@ Phx.vista.HorasPiloto=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '40%',
 				gwidth: 120,
-                renderer: (value,p,record) => {                      
+                renderer: (value,p,record) => {
                         if (value == null){
                             return  '';
                         }else{
                             return  String.format('<div style="text-align:center;">{0}</div>', value);
                         }
-                } 			                				
+                }
 			},
 				type:'NumberField',
 				filters:{pfiltro:'hopilo.horas_simulador_fix',type:'numeric'},
@@ -269,25 +281,25 @@ Phx.vista.HorasPiloto=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '40%',
 				gwidth: 120,
-                renderer: (value,p,record) => {  
+                renderer: (value,p,record) => {
                     if(record.data.tipo_reg != 'summary'){
                         if (value == null){
                             return  '';
                         }else{
                             return  String.format('<div style="text-align:center;">{0}</div>', value);
-                        }                        
+                        }
                     }
                     else{
                         return '<hr><center><b><p style=" color:green; font-size:15px;">Total: </p></b></center>';
                     }
-                } 			                				
+                }
 			},
 				type:'NumberField',
 				filters:{pfiltro:'hopilo.horas_simulador_fix',type:'numeric'},
 				id_grupo:1,
 				grid:true,
 				form:true
-		},                
+		},
 		{
 			config:{
 				name: 'pago_variable',
@@ -295,15 +307,15 @@ Phx.vista.HorasPiloto=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: false,
 				anchor: '40%',
 				gwidth: 100,
-                renderer: (value, p, record) => {                        
+                renderer: (value, p, record) => {
                     if(record.data.tipo_reg != 'summary'){
                         return  String.format('<div style="text-align:right;">{0}</div>', Ext.util.Format.number(value,'0.000,00/i'));
                     }else{
                         return  String.format('<hr><div style="font-size:15px; float:right; color:black;"><b><font>{0}</font><b></div>', Ext.util.Format.number(record.data.total_pago_variable,'0.000,00/i'));
                     }
-                }	
+                }
 			},
-				type:'NumberField',				
+				type:'NumberField',
 				id_grupo:1,
 				grid:true,
 				form:false
@@ -315,11 +327,11 @@ Phx.vista.HorasPiloto=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: false,
 				anchor: '40%',
 				gwidth: 100,
-                renderer: (value, p, record) => {  
+                renderer: (value, p, record) => {
                     return  String.format('<div style="text-align:right;">{0}</div>', Ext.util.Format.number(value,'0.000,00/i'));
-                }				
+                }
 			},
-				type:'NumberField',				
+				type:'NumberField',
 				id_grupo:1,
 				grid:true,
 				form:false
@@ -331,11 +343,11 @@ Phx.vista.HorasPiloto=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: false,
 				anchor: '40%',
 				gwidth: 150,
-                renderer: (value, p, record) => {  
+                renderer: (value, p, record) => {
                     return  String.format('<div style="text-align:right;">{0}</div>', Ext.util.Format.number(value,'0.000,00/i'));
-                }				
+                }
 			},
-				type:'NumberField',				
+				type:'NumberField',
 				id_grupo:1,
 				grid:true,
 				form:false
@@ -347,11 +359,11 @@ Phx.vista.HorasPiloto=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: false,
 				anchor: '40%',
 				gwidth: 150,
-                renderer: (value, p, record) => {  
+                renderer: (value, p, record) => {
                     return  String.format('<div style="text-align:right;">{0}</div>', Ext.util.Format.number(value,'0.000,00/i'));
-                }				
+                }
 			},
-				type:'NumberField',				
+				type:'NumberField',
 				id_grupo:1,
 				grid: true,
 				form: false
@@ -363,15 +375,15 @@ Phx.vista.HorasPiloto=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: false,
 				anchor: '40%',
 				gwidth: 150,
-                renderer: (value, p, record) => {  
+                renderer: (value, p, record) => {
                     return  String.format('<div style="text-align:right;">{0}</div>', Ext.util.Format.number(value,'0.000,00/i'));
-                }				
+                }
 			},
-				type:'NumberField',				
+				type:'NumberField',
 				id_grupo:1,
 				grid: true,
 				form: false
-		},             
+		},
 		{
 			config:{
 				name: 'gestion',
@@ -401,7 +413,7 @@ Phx.vista.HorasPiloto=Ext.extend(Phx.gridInterfaz,{
 				id_grupo:1,
 				grid:true,
 				form:false
-		},                           
+		},
 		{
 			config:{
 				name: 'estado',
@@ -439,7 +451,7 @@ Phx.vista.HorasPiloto=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-							format: 'd/m/Y', 
+							format: 'd/m/Y',
 							renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
 			},
 				type:'DateField',
@@ -500,7 +512,7 @@ Phx.vista.HorasPiloto=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-							format: 'd/m/Y', 
+							format: 'd/m/Y',
 							renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
 			},
 				type:'DateField',
@@ -523,9 +535,9 @@ Phx.vista.HorasPiloto=Ext.extend(Phx.gridInterfaz,{
 				id_grupo:1,
 				grid:true,
 				form:false
-		}        
+		}
 	],
-	tam_pag:50,	
+	tam_pag:50,
 	title:'Detalle Calculo sueldo piloto',
 	ActSave:'../../sis_horas_piloto/control/HorasPiloto/insertarHorasPiloto',
 	ActDel:'../../sis_horas_piloto/control/HorasPiloto/eliminarHorasPiloto',
@@ -563,7 +575,7 @@ Phx.vista.HorasPiloto=Ext.extend(Phx.gridInterfaz,{
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},
         {name:'id_funcionario', type:'numeric'}
-		
+
 	],
 	sortInfo:{
 		field: 'nombre_piloto',
@@ -577,29 +589,29 @@ Phx.vista.HorasPiloto=Ext.extend(Phx.gridInterfaz,{
 
 
 	onReloadPage:function(m)
-	{		
-		this.maestro=m;        
+	{
+		this.maestro=m;
 		this.store.baseParams={id_archivo_horas_piloto:this.maestro.id_archivo_horas_piloto};
-		this.load({params:{start:0, limit:50}});			
-	},    
+		this.load({params:{start:0, limit:50}});
+	},
 
 	loadValoresIniciales:function()
-	{                
+	{
 		Phx.vista.HorasPiloto.superclass.loadValoresIniciales.call(this);
-		this.getComponente('id_archivo_horas_piloto').setValue(this.maestro.id_archivo_horas_piloto);				
+		this.getComponente('id_archivo_horas_piloto').setValue(this.maestro.id_archivo_horas_piloto);
 	},
     iniciarEventos:function(){
-        this.Cmp.id_funcionario.on('select', (c, r, n) => {            
+        this.Cmp.id_funcionario.on('select', (c, r, n) => {
             this.Cmp.ci.reset();
             this.Cmp.ci.setValue(r.data.ci);
             this.Cmp.ci.modificado = true;
         },this);
-        
-        
+
+
     },
     PilHorasVuelo: function (){
-            var data = this.maestro.id_archivo_horas_piloto;            
-            Phx.CP.loadingShow();					 				
+            var data = this.maestro.id_archivo_horas_piloto;
+            Phx.CP.loadingShow();
             Ext.Ajax.request({
                             url:'../../sis_horas_piloto/control/ArchivoHorasPiloto/reportePiHorasVuelo',
                             params:{id_archivo_horas_piloto: data},
@@ -607,9 +619,7 @@ Phx.vista.HorasPiloto=Ext.extend(Phx.gridInterfaz,{
                             failure: this.conexionFailure,
                             timeout:this.timeout,
                             scope:this
-            });							
-    }    
+            });
+    }
 })
 </script>
-		
-		
