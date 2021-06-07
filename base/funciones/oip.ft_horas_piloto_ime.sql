@@ -381,7 +381,7 @@ BEGIN
 
 
             IF (v_rec_esc.haber_basico is null or v_rec_esc.remuneracion_basica is null ) then
-            	raise exception 'El funcionario % no cuenta con un haber basico ',coalesce(v_rec_esc.desc_funcionario2,v_rec.nombre_piloto);
+            	            	raise exception 'El funcionario % no cuenta con un haber basico o su cargo de %, no esta parametrizada en anexo escala salarial, para pilotos.',coalesce(v_rec_esc.desc_funcionario2,v_rec.nombre_piloto),v_rec_esc.nombre;
             end if;
 
             if v_rec_esc.pic_sic <> v_rec.pic_sic then
