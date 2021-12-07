@@ -72,7 +72,8 @@ BEGIN
 						hopilo.fecha_mod,
 						usu1.cuenta as usr_reg,
 						usu2.cuenta as usr_mod,
-                        hopilo.id_funcionario
+                        hopilo.id_funcionario,
+						hopilo.pic_sic_servicio
 						from oip.thoras_piloto hopilo
 						inner join segu.tusuario usu1 on usu1.id_usuario = hopilo.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = hopilo.id_usuario_mod

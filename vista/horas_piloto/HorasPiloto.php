@@ -11,7 +11,7 @@ header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
 Phx.vista.HorasPiloto=Ext.extend(Phx.gridInterfaz,{
-
+	plantaIni:'si',
 	constructor:function(config){
 		this.maestro=config.maestro;
     	//llama al constructor de la clase padre
@@ -25,14 +25,18 @@ Phx.vista.HorasPiloto=Ext.extend(Phx.gridInterfaz,{
             handler:this.PilHorasVuelo,
             tooltip: '<b>Finaliza</b><br/>Historial de cambios de estado.'
         });
+		this.finCons = true;
 	},
 	gruposBarraTareas:[
 			{name: 'si', title: '<h1 style="text-align: center; color: #00B167;">PLANTA</h1>',grupo: 0, height: 0} ,
 			{name: 'no', title: '<h1 style="text-align: center; color: #FF8F85;">OTROS</h1>', grupo: 1, height: 1},
 			],
 	actualizarSegunTab: function(name, indice){
+		if(this.finCons){
+			(name=='si')?this.plantaIni='si':this.plantaIni='no';
 			this.store.baseParams.planta = name;
 			this.load({params:{start:0, limit:this.tam_pag}});
+		}
 	},
 	bnewGroups: [],
 	bdelGroups:  [],
@@ -135,10 +139,10 @@ Phx.vista.HorasPiloto=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'pic_sic',
-				fieldLabel: 'Piloto || Copiloto',
+				fieldLabel: 'Piloto || Copiloto Item ERP',
 				allowBlank: true,
 				anchor: '40%',
-				gwidth: 100,
+				gwidth: 150,
                 renderer: (value) => {
                     if(value == 'PIC'){
                         return String.format('<div style="color:blue;font-weight:bold;">Piloto</div>');
@@ -156,6 +160,30 @@ Phx.vista.HorasPiloto=Ext.extend(Phx.gridInterfaz,{
 				grid:true,
 				form:true
 		},
+		{
+			config:{
+				name: 'pic_sic_servicio',
+				fieldLabel: 'Piloto || Copiloto SICNO',
+				allowBlank: true,
+				anchor: '40%',
+				gwidth: 150,
+                renderer: (value) => {
+                    if(value == 'PIC'){
+                        return String.format('<div style="color:blue;font-weight:bold;">Piloto</div>');
+                    }else if(value == 'SIC'){
+                        return String.format('<div style="color:black;font-weight:bold;">CoPiloto</div>');
+                    }else{
+                        return '';
+                    }
+                }
+			},
+				type:'TextField',
+				filters:{pfiltro:'hopilo.pic_sic',type:'string'},
+                bottom_filter: true,
+				id_grupo:1,
+				grid:true,
+				form:true
+		},		
 		{
 			config:{
 				name: 'escala_salarial',
@@ -574,7 +602,8 @@ Phx.vista.HorasPiloto=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},
-        {name:'id_funcionario', type:'numeric'}
+        {name:'id_funcionario', type:'numeric'},
+        {name:'pic_sic_servicio', type:'string'}
 
 	],
 	sortInfo:{
@@ -589,9 +618,9 @@ Phx.vista.HorasPiloto=Ext.extend(Phx.gridInterfaz,{
 
 
 	onReloadPage:function(m)
-	{
+	{		
 		this.maestro=m;
-		this.store.baseParams={id_archivo_horas_piloto:this.maestro.id_archivo_horas_piloto};
+		this.store.baseParams={id_archivo_horas_piloto:this.maestro.id_archivo_horas_piloto, planta: this.plantaIni};
 		this.load({params:{start:0, limit:50}});
 	},
 

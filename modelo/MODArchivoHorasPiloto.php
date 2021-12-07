@@ -214,6 +214,7 @@ class MODArchivoHorasPiloto extends MODbase{
         $this->captura('monto_horas_simulador_full', 'numeric');
         $this->captura('monto_horas_simulador_fix', 'numeric');
         $this->captura('tipo_flota', 'varchar');
+        $this->captura('pic_sic_servicio', 'varchar');
 
 		//Ejecuta la instruccion
         $this->armarConsulta();

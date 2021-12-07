@@ -50,6 +50,7 @@ class MODHorasPiloto extends MODbase{
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
 		$this->captura('id_funcionario','int4');
+		$this->captura('pic_sic_servicio','varchar');
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();

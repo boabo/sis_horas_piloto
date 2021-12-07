@@ -131,21 +131,21 @@ class  ReportePiHorasVueloXLS
             ));
         $this->docexcel->setActiveSheetIndex(0);
         $sheet0 = $this->docexcel->getActiveSheet();
-        $this->docexcel->getActiveSheet()->getStyle('B1:F1')->applyFromArray($styleTitulos);
-        $sheet0->mergeCells('C1:D1');
+        $this->docexcel->getActiveSheet()->getStyle('B1:G1')->applyFromArray($styleTitulos);
+        $sheet0->mergeCells('C1:E1');
         $sheet0->setCellValue('C1', 'REPORTE HORAS VUELO PILOTOS - COPILOTOS');
-        $sheet0->mergeCells('C2:D2');
-        $this->docexcel->getActiveSheet()->getStyle('C2:D2')->applyFromArray($styleGestion);
+        $sheet0->mergeCells('C2:E2');
+        $this->docexcel->getActiveSheet()->getStyle('C2:E2')->applyFromArray($styleGestion);
         $this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[0])->setWidth(50);
         $sheet0->setCellValue('C2', 'GESTIÓN: '.$gestion);
-        $sheet0->mergeCells('C3:D3');
+        $sheet0->mergeCells('C3:E3');
         $this->docexcel->getActiveSheet()->getStyle('C3:D3')->applyFromArray($styleGestion);
         $sheet0->setCellValue('C3', 'MES DE: '.$periodo);
-        $sheet0->mergeCells('C4:D4');
-        $this->docexcel->getActiveSheet()->getStyle('C4:D4')->applyFromArray($styleGestion);
+        $sheet0->mergeCells('C4:E4');
+        $this->docexcel->getActiveSheet()->getStyle('C4:E4')->applyFromArray($styleGestion);
         $sheet0->setCellValue('C4', 'Moneda(bolivianos)');
 
-        $this->docexcel->getActiveSheet()->getStyle('A7:F7')->applyFromArray($styleSubTitulos);
+        $this->docexcel->getActiveSheet()->getStyle('A7:G7')->applyFromArray($styleSubTitulos);
 
         $ini = 7;
         //*************************************Cabecera*****************************************
@@ -154,13 +154,15 @@ class  ReportePiHorasVueloXLS
         $this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[1])->setWidth(20);
         $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(1,$ini,'CI');
         $this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[2])->setWidth(20);
-        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(2,$ini,'CARGO');
-        $this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[3])->setWidth(55);
-        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(3,$ini,'NOMBRE ESCALA SALARIAL');
-        $this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[4])->setWidth(20);
-        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(4,$ini,'TIPO FLOTA');
-        $this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[5])->setWidth(15);
-        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(5,$ini,'HORAS VUELO');
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(2,$ini,'CARGO ERP');
+        $this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[3])->setWidth(20);
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(3,$ini,'CARGO SICNO');
+        $this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[4])->setWidth(55);
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(4,$ini,'NOMBRE ESCALA SALARIAL');
+        $this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[5])->setWidth(20);
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(5,$ini,'TIPO FLOTA');
+        $this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[6])->setWidth(15);
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(6,$ini,'HORAS VUELO');
 
         //*************************************Fin Cabecera*****************************************
 
@@ -179,9 +181,10 @@ class  ReportePiHorasVueloXLS
             $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(0,$fila,$value['nombre_piloto']);
             $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(1,$fila,$value['ci']);
             $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(2,$fila,$value['pic_sic']);
-            $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(3,$fila,$value['escala_salarial']);
-            $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(4,$fila,$tipo_flota);
-            $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(5,$fila,$value['horas_vuelo']);
+            $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(3,$fila,$value['pic_sic_servicio']);
+            $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(4,$fila,$value['escala_salarial']);
+            $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(5,$fila,$tipo_flota);
+            $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(6,$fila,$value['horas_vuelo']);
 
             $fila++;
             $contador++;

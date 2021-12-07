@@ -449,8 +449,9 @@ BEGIN
 
                                 update oip.thoras_piloto set
                                 horas_vuelo = v_horas_vuelo,
-                                pic_sic =  v_cargo,
-                                tipo_flota = v_real_tipo_flota
+                                pic_sic =  v_real_pic_sic,
+                                tipo_flota = v_real_tipo_flota,
+                                pic_sic_servicio = v_cargo
                                 where id_archivo_horas_piloto = v_gestion_pago.id_archivo_horas_piloto
                                     and id_funcionario = v_id_funcionario;
                         else
@@ -474,7 +475,8 @@ BEGIN
                                 id_usuario_ai,
                                 usuario_ai,
                                 id_usuario_mod,
-                                fecha_mod
+                                fecha_mod,
+                                pic_sic_servicio
                                 ) values(
                                 'activo',
                                 v_rec.id_gestion,
@@ -493,7 +495,8 @@ BEGIN
                                 v_parametros._id_usuario_ai,
                                 v_parametros._nombre_usuario_ai,
                                 null,
-                                null
+                                null,
+                                v_cargo
                                 );
                           end if;
                       end if;
@@ -611,7 +614,8 @@ BEGIN
                             id_usuario_ai,
                             usuario_ai,
                             id_usuario_mod,
-                            fecha_mod
+                            fecha_mod,
+                            pic_sic_servicio
                             ) values(
                             'activo',
                             v_rec.id_gestion,
@@ -630,7 +634,8 @@ BEGIN
                             v_parametros._id_usuario_ai,
                             v_parametros._nombre_usuario_ai,
                             null,
-                            null
+                            null,
+                            v_cargo
                             );
 							end if;
                       end loop;

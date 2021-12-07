@@ -239,3 +239,13 @@ ALTER TABLE oip.tanexo1
 ALTER TABLE oip.tanexo1
   ADD COLUMN fecha_fin DATE;
 /***********************************F-SCP-BVP-HORAS-PILOTO-0-15/04/2021****************************************/
+/***********************************I-SCP-BVP-HORAS-PILOTO-0-07/12/2021****************************************/
+COMMENT ON COLUMN oip.thoras_piloto.pic_sic
+IS 'cargo PIC - SIC, relacionado al item en el ERP. Caso contrario lo que llega del servicio SICNO';
+
+ALTER TABLE oip.thoras_piloto
+  ADD COLUMN pic_sic_servicio VARCHAR(10);
+
+COMMENT ON COLUMN oip.thoras_piloto.pic_sic_servicio
+IS 'CARGO PIC - SIC, del servicio SICNO';
+/***********************************F-SCP-BVP-HORAS-PILOTO-0-07/12/2021****************************************/

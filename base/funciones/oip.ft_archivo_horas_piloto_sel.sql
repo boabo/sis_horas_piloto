@@ -127,7 +127,9 @@ BEGIN
                           hopi.ci,
                           case when hopi.pic_sic = ''PIC'' then
                           	''PILOTO''::varchar
-                          else ''COPILOTO''::varchar end as pic_sic,
+							  when hopi.pic_sic = ''SIC'' then
+							''COPILOTO''::varchar  
+                          else ''''::varchar end as pic_sic,
                           hopi.horas_vuelo,
                           hopi.horas_simulador_full,
                           hopi.horas_simulador_fix,
@@ -138,7 +140,12 @@ BEGIN
                           hopi.monto_horas_vuelo,
                           hopi.monto_horas_simulador_full,
                           hopi.monto_horas_simulador_fix,
-                          hopi.tipo_flota
+                          hopi.tipo_flota,
+                          case when hopi.pic_sic_servicio = ''PIC'' then
+                          	''PILOTO''::varchar
+                               when hopi.pic_sic_servicio = ''SIC'' then
+                            ''COPILOTO''::varchar
+                          else ''''::varchar end as pic_sic_servicio						  
                     from oip.tarchivo_horas_piloto arhopi
                     inner join oip.thoras_piloto hopi on hopi.id_archivo_horas_piloto = arhopi.id_archivo_horas_piloto
                     inner join param.tgestion ges on ges.id_gestion = arhopi.id_gestion
