@@ -58,14 +58,14 @@ header("content-type: text/javascript; charset=UTF-8");
                                 direction: 'ASC'
                             },
                             totalProperty: 'total',
-                            fields: ['id_escala_salarial', 'nombre', 'codigo','haber_basico'],
+                            fields: ['id_escala_salarial', 'nombre', 'codigo','haber_basico','tipo'],
                             remoteSort: true,
                             baseParams: {par_filtro: 'nombre#codigo#haber_basico'}
                         }),
                         valueField: 'id_escala_salarial',
                         displayField: 'nombre',
                         gdisplayField: 'desc_nombre_salarial',
-                        tpl : '<tpl for="."><div class="x-combo-list-item"><p>Nombre: {nombre}</p><p>Código: {codigo}</p><p>Haber Basico: {haber_basico}</p></div></tpl>',
+                        tpl:'<tpl for="."><div class="x-combo-list-item"><p style="color: darkmagenta"><b>Nombre:</b> {nombre} <b>Codigo:</b> {codigo}</p><p style="color:darkgreen"><b>Tipo: </b>{tipo}</p><p style="color: red"><b>Haber Basico: </b> {haber_basico}</p> </div></tpl>',
                         hiddenName: 'id_escala_salarial',
                         forceSelection: true,
                         typeAhead: false,
